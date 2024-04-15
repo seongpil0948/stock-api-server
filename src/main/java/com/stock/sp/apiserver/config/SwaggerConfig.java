@@ -4,7 +4,7 @@ import io.swagger.v3.oas.models.OpenAPI;
 import io.swagger.v3.oas.models.info.Info;
 import io.swagger.v3.oas.models.info.License;
 import io.swagger.v3.oas.models.servers.Server;
-import org.springdoc.core.GroupedOpenApi;
+import org.springdoc.core.models.GroupedOpenApi;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -35,23 +35,5 @@ public class SwaggerConfig {
 				.version("v1.0")
 				.license(new License().name("Apache 2.0").url("http://abacus.co.kr")))
 				.servers(servers);
-	}
-
-	@Bean
-	public GroupedOpenApi businessGroupOpenApi() {
-		String packagesToScan[] = {"kr.co.idp.common", "kr.co.idp.business", "kr.co.idp.system"};
-		return GroupedOpenApi.builder()
-				.group("Business")
-				.packagesToScan(packagesToScan)
-				.build();
-	}
-
-	@Bean
-	public GroupedOpenApi externalGroupOpenApi() {
-		String packagesToScan[] = {"kr.co.idp.external"};
-		return GroupedOpenApi.builder()
-				.group("External")
-				.packagesToScan(packagesToScan)
-				.build();
 	}
 }
