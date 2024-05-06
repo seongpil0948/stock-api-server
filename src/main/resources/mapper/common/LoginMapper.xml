@@ -1,0 +1,105 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="kr.co.dsi.common.login">
+
+	<select id="selectUserEncPswd" parameterType="java.lang.String" resultType="java.lang.String">
+        /*
+        SQL ID : kr.co.dsi.system.login.dao.LginDao.selectUserEncPswd
+        SQL 명: 사용자 패스워드 조회
+        */
+        SELECT
+        TU.PSWD /* 암호화된 패스워드 */
+        FROM TB_USER TU
+        WHERE
+        TU.USER_ID = #{usrId}
+        AND TU.STAT_CD = 'ACTIVE'
+    </select>
+
+	<select id="selectUser" parameterType="java.lang.String" resultType="kr.co.dsi.common.login.dto.res.LoginUserDto">
+        /*
+        SQL ID : kr.co.dsi.system.login.dao.LginDao.selectUser
+        SQL 명: 로그인할 사용자 조회
+        */
+        SELECT TU.USER_ID AS USER_ID
+             , TU.USER_NM AS USER_NAME
+             , TU.BAS_BRCH AS BASE_HQ_CODE
+             , BRCH_CD.CD_NM as BASE_HQ
+             , TU.LTNO_CITY_NM AS BASE_CITY_CODE
+             , CITY_CD.CD_NM AS BASE_CITY
+             , TU.LTNO_SGG_NM AS BASE_COUNTY_CODE
+             , COUNTY_CD.CD_NM AS BASE_COUNTY
+             , TU.LTNO_EMD_NM AS BASE_DISTRICT_CODE
+             , DISTRICT_CD.CD_NM AS BASE_DISTRICT
+             , TU.LTNO_LDONG_NM AS BASE_DONG
+             , TU.AFLTD_CMPNY AS COMPANY
+             , TU.EMPNUM AS EMPLOYEE_NUM
+        FROM TB_USER TU
+        LEFT JOIN TB_CD TC
+        ON TU.STAT_CD = TC.CD AND TC.CD_GRP = 'STATE_CD'
+        LEFT OUTER JOIN TB_CD BRCH_CD
+                        ON TU.BAS_BRCH = BRCH_CD.CD
+                            AND BRCH_CD.CD_GRP = 'BRCH_CD'
+        LEFT OUTER JOIN TB_CD CITY_CD
+                        ON TU.LTNO_CITY_NM = CITY_CD.CD
+                            AND CITY_CD.CD_GRP = BRCH_CD.CD
+        LEFT OUTER JOIN TB_CD COUNTY_CD
+                        ON TU.LTNO_SGG_NM = COUNTY_CD.CD
+        LEFT OUTER JOIN TB_CD DISTRICT_CD
+                        ON TU.LTNO_EMD_NM = DISTRICT_CD.CD
+        WHERE
+        TU.USER_ID = #{usrId}
+        AND TU.STAT_CD = 'ACTIVE'
+    </select>
+
+    <select id="selectLoginUserRole" parameterType="kr.co.dsi.common.login.dto.req.LoginReqDto" resultType="kr.co.dsi.common.login.dto.res.LoginUserRoleDto">
+        /*
+        SQL ID : kr.co.dsi.system.login.selectLoginUserRole
+        SQL 명: 특정 사용자에게 할당된 역할 목록 조회
+        */
+        SELECT
+              A.ROLE_ID
+            , TR.ROLE_NM AS ROLE_NAME
+        FROM TB_ROLE_USER_MAPG A
+        INNER JOIN TB_ROLE TR
+            ON A.ROLE_ID = TR.ROLE_ID
+        INNER JOIN TB_USER TU
+            ON A.USER_ID = TU.USER_ID
+            AND TU.STAT_CD = 'ACTIVE'
+        WHERE A.USER_ID = #{userId}
+    </select>
+
+    <select id="selectLoginUserMenuList" parameterType="kr.co.dsi.common.login.dto.req.LoginReqDto" resultType="kr.co.dsi.common.login.dto.res.LoginUserMenuDto">
+        WITH RECURSIVE CTE AS (
+            SELECT TM.MENU_ID
+                , TM.MENU_NM
+                , IFNULL(TM.HPOS_MENU_ID, '#') AS HPOS_MENU_ID
+                , TM.MENU_IDX
+                , TM.MENU_NM AS MENU_PATH
+                , TM.MENU_PATH  AS MENU_URL
+            FROM TB_MENU TM
+            WHERE HPOS_MENU_ID IS NULL
+            UNION ALL
+            SELECT TM2.MENU_ID
+                 , TM2.MENU_NM
+                 , TM2.HPOS_MENU_ID
+                 , TM2.MENU_IDX
+                 , CONCAT(C.MENU_PATH, ' > ', TM2.MENU_NM)
+                 , TM2.MENU_PATH  AS MENU_URL
+              FROM TB_MENU TM2
+            INNER JOIN dsi.TB_ROLE_MENU_MAPG TRMM
+                ON TM2.MENU_ID = TRMM.MENU_ID
+               AND TRMM.ROLE_ID = #{roleId}
+        INNER JOIN CTE C
+                ON TM2.HPOS_MENU_ID = C.MENU_ID
+        )
+        SELECT MENU_ID
+             , MENU_NM           AS MENU_NAME
+             , HPOS_MENU_ID      AS PARENT_MENU_ID
+             , MENU_PATH
+             , MENU_IDX          AS MENU_INDEX
+             , MENU_URL
+          FROM CTE MENU
+         ORDER BY MENU_IDX, MENU_PATH
+    </select>
+
+</mapper>

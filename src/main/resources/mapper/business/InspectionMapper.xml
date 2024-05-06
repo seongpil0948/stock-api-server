@@ -1,0 +1,658 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="kr.co.dsi.business.inspection">
+    <select id="selectInspectTargetList" parameterType="kr.co.dsi.business.inspection.dto.req.InspectionTargetReadReqDto" resultType="kr.co.dsi.business.inspection.dto.res.InspectionTargetReadResDto">
+        SELECT SIT.SRFC_CD as REP_FACILITY_CODE
+             , SIT.SRFC_NM as PYLON_NM
+             , SIT.ITFC_CD as INTEGR_FACILITY_CODE
+             , BRCH_CD.CD_NM as CENTRAL_NM
+             , SIT.BRCH_CD as CENTRAL_CODE
+             , SIT.LTNO_CITY_NM as CITY_NM
+             , CITY_CD.CD as CITY_CODE
+             , SIT.LTNO_SGG_NM as COUNTY_NM
+             , COUNTY_CD.CD as COUNTY_CODE
+             , SIT.LTNO_EMD_NM as DISTRICT_NM
+             , DISTRICT_CD.CD as DISTRICT_CODE
+             , DATE_FORMAT(MAX(SI.INSPT_DT), '%y.%m.%d') as INSPECTION_DATE
+             , C.CD_NM as PYLON_TYPE_NM -- 철탑타입?
+             , cast(SIT.LTD_DEGRE as decimal(20,17)) + SIT.LTD_MINU/60 + SIT.LTD_SEC/3600 as LONGITUDE
+             , cast(SIT.LTT_DEGRE as decimal(20,17)) + SIT.LTT_MINU/60 + SIT.LTT_SEC/3600 as LATITUDE
+          FROM TB_SAFETY_INSPC_TRGT SIT
+          LEFT OUTER JOIN TB_SAFETY_INSPT SI
+            ON SIT.SRFC_CD = SI.SRFC_CD
+          LEFT OUTER JOIN TB_CD C
+            ON SIT.PYLN_FRM_CD = C.CD
+           AND C.CD_GRP = 'PYLN_FRM_CD'
+          LEFT OUTER JOIN TB_CD BRCH_CD
+           ON SIT.BRCH_CD = BRCH_CD.CD
+          AND BRCH_CD.CD_GRP = 'BRCH_CD'
+          LEFT OUTER JOIN TB_CD CITY_CD
+            ON SIT.LTNO_CITY_NM = CITY_CD.CD_VLUE
+          AND CITY_CD.CD_GRP = BRCH_CD.CD
+          LEFT OUTER JOIN TB_CD COUNTY_CD 
+            ON SIT.LTNO_SGG_NM = COUNTY_CD.CD_VLUE
+          AND COUNTY_CD.CD_GRP = CITY_CD.CD
+          LEFT OUTER JOIN TB_CD DISTRICT_CD
+            ON SIT.LTNO_EMD_NM = DISTRICT_CD.CD_VLUE
+          AND DISTRICT_CD.CD_GRP = COUNTY_CD.CD
+         WHERE 1=1
+            <if test="inspectionStartDate != null and inspectionStartDate != '' and inspectionEndDate != null and inspectionEndDate != ''">
+                AND SI.INSPT_DT BETWEEN STR_TO_DATE(#{inspectionStartDate},'%Y%m%d') AND STR_TO_DATE(CONCAT(#{inspectionEndDate},'235959'), '%Y%m%d%H%i%s')
+            </if>
+            <if test="keyword != null and keyword != ''">
+                AND (SIT.SRFC_NM LIKE CONCAT('%', REPLACE(REPLACE(#{keyword}, '_', '\\_'), '%', '\\%'), '%')
+                    OR SIT.ITFC_CD LIKE CONCAT('%', REPLACE(REPLACE(#{keyword}, '_', '\\_'), '%', '\\%'), '%') )
+            </if>
+            <if test='centralCode != null and !"".equals(centralCode) and !"ALL".equals(centralCode)'>
+                AND SIT.BRCH_CD = #{centralCode}
+            </if>
+            <if test='cityVal != null and !"".equals(cityVal) and !"ALL".equals(cityVal)'>
+                AND CITY_CD.CD = #{cityVal}
+            </if>
+            <if test='countyVal != null and !"".equals(countyVal) and !"ALL".equals(countyVal)'>
+                AND COUNTY_CD.CD = #{countyVal}
+            </if>
+            <if test='districtVal != null and !"".equals(districtVal) and !"ALL".equals(districtVal)'>
+                AND DISTRICT_CD.CD = #{districtVal}
+            </if>
+         GROUP BY SIT.SRFC_CD, C.CD_NM, BRCH_CD.CD_NM, CITY_CD.CD, COUNTY_CD.CD, DISTRICT_CD.CD
+         ORDER BY INSPECTION_DATE <if test='"DESC".equals(orderBy)'>DESC</if> , SIT.SRFC_NM
+         LIMIT #{rowStart}, #{limit}
+    </select>
+
+    <select id="selectInspectTargetListCount" parameterType="kr.co.dsi.business.inspection.dto.req.InspectionTargetReadReqDto" resultType="java.lang.Integer">
+        SELECT count(distinct (SIT.SRFC_CD)) as REP_FACILITY_CODE
+          FROM TB_SAFETY_INSPC_TRGT SIT
+          LEFT OUTER JOIN TB_SAFETY_INSPT SI
+            ON SIT.SRFC_CD = SI.SRFC_CD
+          LEFT OUTER JOIN TB_CD C
+            ON SIT.PYLN_FRM_CD = C.CD
+           AND C.CD_GRP = 'PYLN_FRM_CD'
+          LEFT OUTER JOIN TB_CD BRCH_CD
+            ON SIT.BRCH_CD = BRCH_CD.CD
+           AND BRCH_CD.CD_GRP = 'BRCH_CD'
+          LEFT OUTER JOIN TB_CD CITY_CD
+            ON SIT.LTNO_CITY_NM = CITY_CD.CD_VLUE
+           AND CITY_CD.CD_GRP = BRCH_CD.CD
+          LEFT OUTER JOIN TB_CD COUNTY_CD
+            ON SIT.LTNO_SGG_NM = COUNTY_CD.CD_VLUE
+           AND COUNTY_CD.CD_GRP = CITY_CD.CD
+          LEFT OUTER JOIN TB_CD DISTRICT_CD
+            ON SIT.LTNO_EMD_NM = DISTRICT_CD.CD_VLUE
+           AND DISTRICT_CD.CD_GRP = COUNTY_CD.CD
+         WHERE 1=1
+        <if test="inspectionStartDate != null and inspectionStartDate != '' and inspectionEndDate != null and inspectionEndDate != ''">
+            AND SI.INSPT_DT BETWEEN STR_TO_DATE(#{inspectionStartDate},'%Y%m%d') AND STR_TO_DATE(CONCAT(#{inspectionEndDate},'235959'), '%Y%m%d%H%i%s')
+        </if>
+        <if test="keyword != null and keyword != ''">
+            AND (SIT.SRFC_NM LIKE CONCAT('%', REPLACE(REPLACE(#{keyword}, '_', '\\_'), '%', '\\%'), '%')
+            OR SIT.ITFC_CD LIKE CONCAT('%', REPLACE(REPLACE(#{keyword}, '_', '\\_'), '%', '\\%'), '%') )
+        </if>
+        <if test='centralCode != null and !"".equals(centralCode) and !"ALL".equals(centralCode)'>
+            AND SIT.BRCH_CD = #{centralCode}
+        </if>
+        <if test='cityVal != null and !"".equals(cityVal) and !"ALL".equals(cityVal)'>
+            AND CITY_CD.CD = #{cityVal}
+        </if>
+        <if test='countyVal != null and !"".equals(countyVal) and !"ALL".equals(countyVal)'>
+            AND COUNTY_CD.CD = #{countyVal}
+        </if>
+        <if test='districtVal != null and !"".equals(districtVal) and !"ALL".equals(districtVal)'>
+            AND DISTRICT_CD.CD = #{districtVal}
+        </if>
+    </select>
+
+    <select id="selectInspectionTargetOne" parameterType="java.lang.String" resultType="kr.co.dsi.business.inspection.dto.res.InspectionTargetReadResDto">
+        SELECT SIT.SRFC_CD as REP_FACILITY_CODE
+             , SIT.SRFC_NM as PYLON_NM
+             , SIT.ITFC_CD as INTEGR_FACILITY_CODE
+             , BRCH_CD.CD_NM as CENTRAL_NM
+             , SIT.BRCH_CD as CENTRAL_CODE
+             , SIT.LTNO_CITY_NM as CITY_NM
+             , CITY_CD.CD as CITY_CODE
+             , SIT.LTNO_SGG_NM as COUNTY_NM
+             , COUNTY_CD.CD as COUNTY_CODE
+             , SIT.LTNO_EMD_NM as DISTRICT_NM
+             , DISTRICT_CD.CD as DISTRICT_CODE
+             , C.CD_NM as PYLON_TYPE_NM
+             , SRVC_STA_DT as INSTALL_DATE
+             , case when ZPIRHI is null and GRUD_HGHT is null then '-'
+                    else CONCAT(COALESCE(ZPIRHI,'-'),' / ', COALESCE(GRUD_HGHT,'-')) end as PYLON_HEIGHT
+             , cast(SIT.LTD_DEGRE as decimal(20,17)) + SIT.LTD_MINU/60 + SIT.LTD_SEC/3600 as LONGITUDE
+             , cast(SIT.LTT_DEGRE as decimal(20,17)) + SIT.LTT_MINU/60 + SIT.LTT_SEC/3600 as LATITUDE
+          FROM TB_SAFETY_INSPC_TRGT SIT
+                   LEFT OUTER JOIN TB_CD C
+                                   ON SIT.PYLN_FRM_CD = C.CD
+                                       AND C.CD_GRP = 'PYLN_FRM_CD'
+           LEFT OUTER JOIN TB_CD BRCH_CD
+                           ON SIT.BRCH_CD = BRCH_CD.CD
+                               AND BRCH_CD.CD_GRP = 'BRCH_CD'
+           LEFT OUTER JOIN TB_CD CITY_CD
+                           ON SIT.LTNO_CITY_NM = CITY_CD.CD_VLUE
+                               AND CITY_CD.CD_GRP = BRCH_CD.CD
+           LEFT OUTER JOIN TB_CD COUNTY_CD
+                           ON SIT.LTNO_SGG_NM = COUNTY_CD.CD_VLUE
+                               AND COUNTY_CD.CD_GRP = CITY_CD.CD
+           LEFT OUTER JOIN TB_CD DISTRICT_CD
+                           ON SIT.LTNO_EMD_NM = DISTRICT_CD.CD_VLUE
+                               AND DISTRICT_CD.CD_GRP = COUNTY_CD.CD
+         WHERE SRFC_CD = #{repFacilityCode}
+    </select>
+
+    <select id="selectInspectionHistory" parameterType="kr.co.dsi.business.inspection.dto.req.InspectionTargetReadReqDto" resultType="kr.co.dsi.business.inspection.dto.res.InspectionHistReadResDto">
+        SELECT SI.INSPT_SNO as INSPECTION_SNO
+             , SRFC_CD as REP_FACILITY_CODE
+             , DATE_FORMAT(INSPT_DT,  '%y.%m.%d') as INSPECTION_DATE
+             , GROUP_CONCAT(U.USER_NM) as INSPECTOR_NM
+             , T.TRANS_MSG as INSPECTION_STATUS
+             , SI.AI_ANLYS_STAT as INSPECTION_STATUS_CODE
+          FROM TB_SAFETY_INSPT SI
+                 LEFT JOIN TB_SAFETY_INSPT_USER SIU
+                           ON SI.INSPT_SNO = SIU.INSPT_SNO
+                 LEFT JOIN TB_USER U
+                           ON SIU.USER_ID = U.USER_ID
+                 LEFT JOIN TB_CD C
+                           ON C.CD_GRP = 'INSPECTION_STATUS'
+                          AND C.CD = SI.AI_ANLYS_STAT
+                 LEFT JOIN TB_TRANS T
+                         ON T.LNK_ID = C.CD_ID
+                        AND T.LOCALE_CD = #{localeCd}
+         WHERE SI.SRFC_CD = #{repFacilityCode}
+         GROUP BY SI.INSPT_SNO, SI.INSPT_DT, C.CD_NM, T.TRANS_MSG
+         ORDER BY SI.INSPT_DT DESC
+    </select>
+
+    <select id="selectInspectionStatusList" parameterType="kr.co.dsi.business.inspection.dto.req.InspectionStatusReadReqDto" resultType="kr.co.dsi.business.inspection.dto.res.InspectionStatusReadResDto">
+        SELECT  DISTINCT (SI.INSPT_SNO) as INSPECTION_SNO
+             , SI.SRFC_CD as REP_FACILITY_CODE
+             , SIT.SRFC_NM as PYLON_NM
+             , SIT.ITFC_CD as INTEGR_FACILITY_CODE
+            , BRCH_CD.CD_NM as CENTRAL_NM
+            , SIT.BRCH_CD as CENTRAL_CODE
+            , SIT.LTNO_CITY_NM as CITY_NM
+            , CITY_CD.CD as CITY_CODE
+            , SIT.LTNO_SGG_NM as COUNTY_NM
+            , COUNTY_CD.CD as COUNTY_CODE
+            , SIT.LTNO_EMD_NM as DISTRICT_NM
+            , DISTRICT_CD.CD as DISTRICT_CODE
+             , C2.CD_NM as PYLON_TYPE_NM
+             , date_format(SI.INSPT_DT, '%y.%m.%d') as INSPECTION_DATE
+             , T.TRANS_MSG as INSPECTION_STATUS
+             , SI.INSPT_DT
+             , SI.AI_ANLYS_STAT as INSPECTION_STATUS_CD
+             , cast(SIT.LTD_DEGRE as decimal(20,17)) + SIT.LTD_MINU/60 + SIT.LTD_SEC/3600 as LONGITUDE
+             , cast(SIT.LTT_DEGRE as decimal(20,17)) + SIT.LTT_MINU/60 + SIT.LTT_SEC/3600 as LATITUDE
+          FROM TB_SAFETY_INSPT SI
+          LEFT OUTER JOIN TB_SAFETY_INSPC_TRGT SIT
+            ON SI.SRFC_CD = SIT.SRFC_CD
+          LEFT OUTER JOIN TB_SAFETY_INSPT_USER SIU
+            ON SIU.INSPT_SNO = SI.INSPT_SNO
+          LEFT JOIN TB_CD C
+            ON C.CD_GRP = 'INSPECTION_STATUS'
+            AND C.CD = SI.AI_ANLYS_STAT
+          LEFT JOIN TB_TRANS T
+            ON C.CD_ID = T.LNK_ID
+           AND T.LOCALE_CD = #{localeCd}
+          LEFT OUTER JOIN TB_CD C2
+            ON SIT.PYLN_FRM_CD = C2.CD
+            AND C2.CD_GRP = 'PYLN_FRM_CD'
+          LEFT OUTER JOIN TB_CD BRCH_CD
+            ON SIT.BRCH_CD = BRCH_CD.CD
+           AND BRCH_CD.CD_GRP = 'BRCH_CD'
+          LEFT OUTER JOIN TB_CD CITY_CD
+            ON SIT.LTNO_CITY_NM = CITY_CD.CD_VLUE
+           AND CITY_CD.CD_GRP = BRCH_CD.CD
+          LEFT OUTER JOIN TB_CD COUNTY_CD
+            ON SIT.LTNO_SGG_NM = COUNTY_CD.CD_VLUE
+           AND COUNTY_CD.CD_GRP = CITY_CD.CD
+          LEFT OUTER JOIN TB_CD DISTRICT_CD
+            ON SIT.LTNO_EMD_NM = DISTRICT_CD.CD_VLUE
+           AND DISTRICT_CD.CD_GRP = COUNTY_CD.CD
+         WHERE 1 = 1
+            <if test="inspectionStartDate != null and inspectionStartDate != '' and inspectionEndDate != null and inspectionEndDate != ''">
+                AND SI.INSPT_DT BETWEEN STR_TO_DATE(#{inspectionStartDate},'%Y%m%d') AND STR_TO_DATE(CONCAT(#{inspectionEndDate},'235959'), '%Y%m%d%H%i%s')
+            </if>
+            <if test="keyword != null and keyword != ''">
+                AND (SIT.SRFC_NM LIKE CONCAT('%', REPLACE(REPLACE(#{keyword}, '_', '\\_'), '%', '\\%'), '%')
+                OR SIT.ITFC_CD LIKE CONCAT('%', REPLACE(REPLACE(#{keyword}, '_', '\\_'), '%', '\\%'), '%') )
+            </if>
+            <if test='centralCode != null and !"".equals(centralCode) and !"ALL".equals(centralCode)'>
+                AND SIT.BRCH_CD = #{centralCode}
+            </if>
+            <if test='cityVal != null and !"".equals(cityVal) and !"ALL".equals(cityVal)'>
+                AND CITY_CD.CD = #{cityVal}
+            </if>
+            <if test='countyVal != null and !"".equals(countyVal) and !"ALL".equals(countyVal)'>
+                AND COUNTY_CD.CD = #{countyVal}
+            </if>
+            <if test='districtVal != null and !"".equals(districtVal) and !"ALL".equals(districtVal)'>
+                AND DISTRICT_CD.CD = #{districtVal}
+            </if>
+            <if test="inspector != null and inspector.size > 0 ">
+                AND SIU.USER_ID IN
+                <foreach collection="inspector" item="userId" open="(" close=")" separator=",">
+                    #{userId}
+                </foreach>
+            </if>
+            <if test="inspectionStatusCode != null and inspectionStatusCode.size > 0">
+                AND SI.AI_ANLYS_STAT IN
+                <foreach collection="inspectionStatusCode" item="statCd" open="(" close=")" separator=",">
+                    #{statCd}
+                </foreach>
+            </if>
+         ORDER BY SI.INSPT_DT <if test='"DESC".equals(orderBy)'>DESC</if>, SI.INSPT_SNO <if test='"DESC".equals(orderBy)'>DESC</if>
+         LIMIT #{rowStart}, #{limit}
+    </select>
+
+    <select id="selectInspectionStatusListCount" parameterType="kr.co.dsi.business.inspection.dto.req.InspectionStatusReadReqDto" resultType="java.lang.Integer">
+        SELECT  COUNT(DISTINCT (SI.INSPT_SNO) )as INSPECTION_SNO
+        FROM TB_SAFETY_INSPT SI
+        LEFT OUTER JOIN TB_SAFETY_INSPC_TRGT SIT
+        ON SI.SRFC_CD = SIT.SRFC_CD
+        LEFT OUTER JOIN TB_SAFETY_INSPT_USER SIU
+        ON SIU.INSPT_SNO = SI.INSPT_SNO
+        LEFT OUTER JOIN TB_CD BRCH_CD
+        ON SIT.BRCH_CD = BRCH_CD.CD
+        AND BRCH_CD.CD_GRP = 'BRCH_CD'
+        LEFT OUTER JOIN TB_CD CITY_CD
+        ON SIT.LTNO_CITY_NM = CITY_CD.CD_VLUE
+        AND CITY_CD.CD_GRP = BRCH_CD.CD
+        LEFT OUTER JOIN TB_CD COUNTY_CD
+        ON SIT.LTNO_SGG_NM = COUNTY_CD.CD_VLUE
+        AND COUNTY_CD.CD_GRP = CITY_CD.CD
+        LEFT OUTER JOIN TB_CD DISTRICT_CD
+        ON SIT.LTNO_EMD_NM = DISTRICT_CD.CD_VLUE
+        AND DISTRICT_CD.CD_GRP = COUNTY_CD.CD
+        WHERE 1 = 1
+        <if test="inspectionStartDate != null and inspectionStartDate != '' and inspectionEndDate != null and inspectionEndDate != ''">
+            AND SI.INSPT_DT BETWEEN STR_TO_DATE(#{inspectionStartDate},'%Y%m%d') AND STR_TO_DATE(CONCAT(#{inspectionEndDate},'235959'), '%Y%m%d%H%i%s')
+        </if>
+        <if test="keyword != null and keyword != ''">
+            AND (SIT.SRFC_NM LIKE CONCAT('%', REPLACE(REPLACE(#{keyword}, '_', '\\_'), '%', '\\%'), '%')
+            OR SIT.ITFC_CD LIKE CONCAT('%', REPLACE(REPLACE(#{keyword}, '_', '\\_'), '%', '\\%'), '%') )
+        </if>
+        <if test='centralCode != null and !"".equals(centralCode) and !"ALL".equals(centralCode)'>
+            AND SIT.BRCH_CD = #{centralCode}
+        </if>
+        <if test='cityVal != null and !"".equals(cityVal) and !"ALL".equals(cityVal)'>
+            AND CITY_CD.CD = #{cityVal}
+        </if>
+        <if test='countyVal != null and !"".equals(countyVal) and !"ALL".equals(countyVal)'>
+            AND COUNTY_CD.CD = #{countyVal}
+        </if>
+        <if test='districtVal != null and !"".equals(districtVal) and !"ALL".equals(districtVal)'>
+            AND DISTRICT_CD.CD = #{districtVal}
+        </if>
+        <if test="inspector != null and inspector.size > 0 ">
+            AND SIU.USER_ID IN
+            <foreach collection="inspector" item="userId" open="(" close=")" separator=",">
+                #{userId}
+            </foreach>
+        </if>
+        <if test="inspectionStatusCode != null and inspectionStatusCode.size > 0">
+            AND SI.AI_ANLYS_STAT IN
+            <foreach collection="inspectionStatusCode" item="statCd" open="(" close=")" separator=",">
+                #{statCd}
+            </foreach>
+        </if>
+    </select>
+
+    <select id="selectInspectionStatus" parameterType="kr.co.dsi.business.inspection.dto.req.InspectionStatusReadReqDto" resultType="kr.co.dsi.business.inspection.dto.res.InspectionStatusReadResDto">
+        SELECT INSPT_SNO as INSPECTION_SNO
+             , SIT.ITFC_CD as INTEGR_FACILITY_CODE
+             , SI.SRFC_CD as REP_FACILITY_CODE
+             , BRCH_CD.CD_NM as CENTRAL_NM
+             , SIT.BRCH_CD as CENTRAL_CODE
+             , SIT.LTNO_CITY_NM as CITY_NM
+             , CITY_CD.CD as CITY_CODE
+             , SIT.LTNO_SGG_NM as COUNTY_NM
+             , COUNTY_CD.CD as COUNTY_CODE
+             , SIT.LTNO_EMD_NM as DISTRICT_NM
+             , DISTRICT_CD.CD as DISTRICT_CODE
+             , SI.FAIL_REASON
+             , SI.MODEL_PRGS as PROGRESS
+             , date_format(INSPT_DT,'%Y.%m.%d') as INSPECTION_DATE
+             , date_format(SRVC_STA_DT,'%Y.%m.%d') as INSTALL_DATE
+             , date_format(SBMT_DT,'%Y.%m.%d') as REPORT_SUBMIT_DATE
+             , RSLT_SMRY
+             , ETC as ETC
+             , REMARK as REMARK
+             , INSPT_RSLT_SYNT as INSPECTION_RESULT
+             , ACTION_CNTN as ACT_CNTN
+             , NOTE
+             , IRON_CRS_YN as IRON_CRS_YN
+             , BLNUT_LOOSE_YN as BLNUT_LOOSE_YN
+             , TILT_YN as TILT_YN
+             , ANTTR_YN as ANTENNA_TRUST_YN
+             , LADDER_YN as LADDER_YN
+             , WRKSRF_YN  as WORK_TBL_YN
+             , GRNSBS_YN as GROUND_SUBSIDENCE_YN
+             , ROOFWTPR_YN as ROOT_WATER_PROOF_YN
+             , date_format(SI.REG_DT,'%Y.%m.%d') as INSPECTION_REG_DATE
+             , C2.CD_NM as PYLON_TYPE_NM
+             , T.TRANS_MSG as INSPECTION_STATUS
+             , SI.AI_ANLYS_STAT as INSPECTION_STATUS_CD
+             , SIT.SRVC_STA_DT as INSTALL_DATE
+             , case when ZPIRHI is null and GRUD_HGHT is null then '-'
+                    else CONCAT(COALESCE(ZPIRHI,'-'),' / ', COALESCE(GRUD_HGHT,'-')) end as PYLON_HEIGHT
+             , SIT.SRFC_NM as PYLON_NM
+             , cast(SIT.LTD_DEGRE as decimal(20,17)) + SIT.LTD_MINU/60 + SIT.LTD_SEC/3600 as LONGITUDE
+             , cast(SIT.LTT_DEGRE as decimal(20,17)) + SIT.LTT_MINU/60 + SIT.LTT_SEC/3600 as LATITUDE
+          FROM TB_SAFETY_INSPT SI
+          LEFT JOIN TB_SAFETY_INSPC_TRGT SIT
+            ON SI.SRFC_CD = SIT.SRFC_CD
+          LEFT JOIN TB_CD C
+            ON C.CD_GRP = 'INSPECTION_STATUS'
+           AND C.CD = SI.AI_ANLYS_STAT
+          LEFT JOIN TB_TRANS T
+            ON C.CD_ID = T.LNK_ID
+           AND T.LOCALE_CD = #{localeCd}
+          LEFT OUTER JOIN TB_CD C2
+            ON SIT.PYLN_FRM_CD = C2.CD
+           AND C2.CD_GRP = 'PYLN_FRM_CD'
+          LEFT OUTER JOIN TB_CD BRCH_CD
+           ON SIT.BRCH_CD = BRCH_CD.CD
+          AND BRCH_CD.CD_GRP = 'BRCH_CD'
+          LEFT OUTER JOIN TB_CD CITY_CD
+                          ON SIT.LTNO_CITY_NM = CITY_CD.CD_VLUE
+                              AND CITY_CD.CD_GRP = BRCH_CD.CD
+          LEFT OUTER JOIN TB_CD COUNTY_CD
+                          ON SIT.LTNO_SGG_NM = COUNTY_CD.CD_VLUE
+                              AND COUNTY_CD.CD_GRP = CITY_CD.CD
+          LEFT OUTER JOIN TB_CD DISTRICT_CD
+                          ON SIT.LTNO_EMD_NM = DISTRICT_CD.CD_VLUE
+                              AND DISTRICT_CD.CD_GRP = COUNTY_CD.CD
+         WHERE INSPT_SNO = #{inspectionSno}
+    </select>
+
+    <select id="selectInspectorList" parameterType="kr.co.dsi.business.inspection.dto.req.InspectionStatusReadReqDto" resultType="kr.co.dsi.business.inspection.dto.res.InspectorResDto">
+        SELECT tsiu.USER_ID INSPECTOR_ID
+             , tu.USER_NM INSPECTOR_NAME
+          FROM TB_SAFETY_INSPT_USER tsiu
+                 LEFT OUTER JOIN TB_USER tu
+                   ON tsiu.USER_ID = tu.USER_ID
+         WHERE INSPT_SNO = #{inspectionSno}
+    </select>
+
+    <insert id="insertInspectionWating" parameterType="kr.co.dsi.business.inspection.dto.req.InspectionStatusCrteReqDto" useGeneratedKeys="true" keyProperty="inspectionSno" keyColumn="INSPT_SNO">
+        INSERT INTO TB_SAFETY_INSPT
+             ( SRFC_CD
+             , AI_ANLYS_STAT
+             , REG_DT
+             , REG_USER_ID
+             , UPD_DT
+             , UPD_USER_ID
+             )
+        VALUES
+             ( #{repFacilityCode, jdbcType=VARCHAR}
+             , 'WAIT'
+             , CURRENT_TIMESTAMP
+             , #{userId, jdbcType=VARCHAR}
+             , CURRENT_TIMESTAMP
+             , #{userId, jdbcType=VARCHAR}
+             )
+    </insert>
+
+    <update id="updateInspectionStatus" parameterType="kr.co.dsi.business.inspection.dto.req.InspectionStatusUpdReqDto">
+        UPDATE dsi.TB_SAFETY_INSPT
+           SET  AI_ANLYS_STAT = #{aiAnalysisStatus, jdbcType=VARCHAR}
+             <if test="inspectionDate != null and inspectionDate != ''">
+                 , INSPT_DT = #{inspectionDate, jdbcType=VARCHAR}
+             </if>
+             <if test="startDate != null and startDate != ''">
+                 , ANLYS_STA_DT = #{startDate, jdbcType=VARCHAR}
+             </if>
+             <if test="boltLooseYn != null and boltLooseYn !=''">
+                , BLNUT_LOOSE_YN = #{boltLooseYn, jdbcType=VARCHAR}
+             </if>
+             , UPD_DT = CURRENT_TIMESTAMP
+             , UPD_USER_ID = #{userId, jdbcType=VARCHAR}
+         WHERE INSPT_SNO = #{inspectionSno, jdbcType=VARCHAR}
+    </update>
+
+    <delete id="deleteInspectionInspectors" parameterType="kr.co.dsi.business.inspection.dto.req.InspectionStatusUpdReqDto">
+        DELETE FROM dsi.TB_SAFETY_INSPT_USER
+         WHERE INSPT_SNO = #{inspectionSno, jdbcType=VARCHAR}
+    </delete>
+
+    <insert id="insertInspectionInspectors" parameterType="kr.co.dsi.business.inspection.dto.req.InspectionStatusTempUpdReqDto">
+        INSERT INTO dsi.TB_SAFETY_INSPT_USER
+             (INSPT_SNO
+             , USER_ID
+             , REG_DT
+             , REG_USER_ID
+             , UPD_DT
+             , UPD_USER_ID)
+        VALUES
+            <foreach collection="inspectorList" item="inspector" separator="," >
+                ( #{inspectionSno, jdbcType=VARCHAR}
+                , #{inspector.inspectorId , jdbcType=VARCHAR}
+                , CURRENT_TIMESTAMP
+                , #{userId, jdbcType=VARCHAR}
+                , CURRENT_TIMESTAMP
+                , #{userId, jdbcType=VARCHAR} )
+            </foreach>
+    </insert>
+
+
+    <delete id="deleteInspection" parameterType="kr.co.dsi.business.inspection.dto.req.InspectionStatusUpdReqDto">
+        DELETE FROM dsi.TB_SAFETY_INSPT
+         WHERE INSPT_SNO = #{inspectionSno, jdbcType=VARCHAR}
+    </delete>
+
+    <update id="updateInsepectionReport" parameterType="kr.co.dsi.business.inspection.dto.req.InspectionStatusUpdReqDto">
+        UPDATE dsi.TB_SAFETY_INSPT
+        SET AI_ANLYS_STAT = #{aiAnalysisStatus , jdbcType=VARCHAR}
+          , ETC = #{etc , jdbcType=VARCHAR}
+          , REMARK = #{remark , jdbcType=VARCHAR}
+          , INSPT_RSLT_SYNT = #{inspectionResult , jdbcType=VARCHAR}
+          , ACTION_CNTN = #{actCntn , jdbcType=VARCHAR}
+        <if test='"Y".equals(saveYn)'>
+            , SBMT_DT = CURRENT_TIMESTAMP
+        </if>
+          , IRON_CRS_YN = #{ironCrsYn , jdbcType=VARCHAR}
+          , TILT_YN = #{tiltYn , jdbcType=VARCHAR}
+          , ANTTR_YN = #{antennaTrustYn , jdbcType=VARCHAR}
+          , LADDER_YN = #{ladderYn , jdbcType=VARCHAR}
+          , WRKSRF_YN = #{workTblYn , jdbcType=VARCHAR}
+          , GRNSBS_YN = #{groundSubsidenceYn , jdbcType=VARCHAR}
+          , ROOFWTPR_YN = #{rootWaterProofYn , jdbcType=VARCHAR}
+          , UPD_DT = CURRENT_TIMESTAMP
+          , UPD_USER_ID = #{userId , jdbcType=VARCHAR}
+        WHERE INSPT_SNO = #{inspectionSno, jdbcType=VARCHAR}
+    </update>
+
+    <select id="selectInspectionResultImageList" parameterType="kr.co.dsi.business.inspection.dto.req.InspectionImgResultReqDto" resultType="kr.co.dsi.business.inspection.dto.res.InspectionImgResultResDto">
+        SELECT IMG_ID
+             , BBOX_LINK
+             , TRGT
+             , ALTTD
+             , NORMAL
+             , RUSTY_RATIO
+             , RUSTY_YELLOW
+             , RUSTY_RED
+             , UNSCREWED_YELLOW
+             , UNSCREWED_RED
+             , MISSING
+             , MEASURE_LEVEL
+             , NOTE
+          FROM TB_IMG_INSPT_RSLT
+         WHERE INSPT_SNO = #{inspectionSno}
+           AND ALTTD BETWEEN #{startVal} AND #{endVal}
+         ORDER BY REG_DT
+         LIMIT #{rowStart}, #{limit}
+    </select>
+
+    <select id="selectInspectionResultImageListCnt" parameterType="kr.co.dsi.business.inspection.dto.req.InspectionImgResultReqDto" resultType="java.lang.Integer">
+        SELECT COUNT(IMG_ID)
+         FROM TB_IMG_INSPT_RSLT
+        WHERE INSPT_SNO = #{inspectionSno}
+          AND ALTTD BETWEEN #{startVal} AND #{endVal}
+    </select>
+    
+    <select id="selectMaxAltitudeResult" parameterType="java.lang.String" resultType="java.lang.Double">
+        SELECT ALTTD
+          FROM TB_IMG_INSPT_RSLT
+         WHERE INSPT_SNO = #{inspectionSno}
+         ORDER BY ALTTD DESC
+    </select>
+    
+    <select id="selectInspectorUserList" parameterType="java.lang.String" resultType="kr.co.dsi.business.inspection.dto.res.InspectorResDto">
+        SELECT USER_ID as INSPECTOR_ID
+             , USER_NM as INSPECTOR_NAME
+             , BAS_BRCH as CENTRAL_NM
+             , LTNO_CITY_NM as CITY_NM
+             , LTNO_SGG_NM as COUNTY_NM
+             , LTNO_EMD_NM as DISTRICT_NM
+             , EMPNUM as EMPLOYEE_NUM
+         FROM TB_USER
+         WHERE STAT_CD = 'ACTIVE'
+         <if test="keyword != null and keyword != ''">
+             AND (USER_ID LIKE CONCAT('%', REPLACE(REPLACE(#{keyword}, '_', '\\_'), '%', '\\%'), '%')
+                OR USER_NM LIKE CONCAT('%', REPLACE(REPLACE(#{keyword}, '_', '\\_'), '%', '\\%'), '%'))
+         </if>
+    </select>
+
+    <select id="selectInspectionStatusExcel" parameterType="kr.co.dsi.business.inspection.dto.req.InspectionExcelReqDto" resultType="kr.co.dsi.business.inspection.dto.res.InspectionExcelResDto">
+        SELECT ROW_NUMBER() over (ORDER BY SI.INSPT_DT <if test='"DESC".equals(orderBy)'>DESC</if> ) AS rowNum
+             , BRCH_CD.CD_NM AS brchNm
+             , SIT.LTNO_CITY_NM as ltnoCityNm
+             , SIT.LTNO_SGG_NM as ltnoSggNm
+             , SIT.LTNO_EMD_NM as ltnoEmdNm
+             , SIT.ITFC_NM as itfcNm
+             , SIT.SRFC_CD as srfcCd
+             , PYLN_TYPE.CD_NM as pylnTypeNm
+             , SIT.GRUD_HGHT as grudHght
+             , DATE_FORMAT(SRVC_STA_DT, '%Y.%m.%d') as installDate
+             , DATE_FORMAT(SI.INSPT_DT, '%Y.%m.%d') as insptDt
+             , STAT.CD_NM AS analStat
+             , CASE IRON_CRS_YN WHEN 'Y' THEN '불량'
+                                WHEN 'N' THEN '정상'
+                                ELSE '-' END  as ironCrsYn
+             , CASE BLNUT_LOOSE_YN WHEN 'Y' THEN '불량'
+                                   WHEN 'N' THEN '정상'
+                                   ELSE '-' END  as blnutLooseYn
+             , CASE TILT_YN WHEN 'Y' THEN '불량'
+                            WHEN 'N' THEN '정상'
+                            ELSE '-' END  as tiltYn
+             , CASE ANTTR_YN WHEN 'Y' THEN '불량'
+                             WHEN 'N' THEN '정상'
+                             ELSE '-' END  as antennaTrustYn
+             , CASE LADDER_YN WHEN 'Y' THEN '불량'
+                              WHEN 'N' THEN '정상'
+                              ELSE '-' END  as ladderYn
+             , CASE WRKSRF_YN WHEN 'Y' THEN '불량'
+                              WHEN 'N' THEN '정상'
+                              ELSE '-' END as workTblYn
+             , CASE GRNSBS_YN WHEN 'Y' THEN '불량'
+                              WHEN 'N' THEN '정상'
+                              ELSE '-' END As groundSubsidenceYn
+             , CASE ROOFWTPR_YN WHEN 'Y' THEN '불량'
+                                WHEN 'N' THEN '정상'
+                                ELSE '-' END as rootWaterProofYn
+             , ETC as etc
+             , INSPT_RSLT_SYNT as inspectionResult
+             , ACTION_CNTN as actCntn
+             , GROUP_CONCAT(U.USER_NM,'(',U.EMPNUM,')') as inspectorNm
+          FROM TB_SAFETY_INSPT SI
+                 LEFT OUTER JOIN TB_SAFETY_INSPC_TRGT SIT
+                                 ON SIT.SRFC_CD = SI.SRFC_CD
+                 LEFT OUTER JOIN TB_CD BRCH_CD
+                                 ON SIT.BRCH_CD = BRCH_CD.CD_VLUE
+                                     AND BRCH_CD.CD_GRP = 'BRCH_CD'
+                 LEFT OUTER JOIN TB_CD PYLN_TYPE
+                                 ON SIT.PYLN_FRM_CD = PYLN_TYPE.CD
+                                     AND PYLN_TYPE.CD_GRP = 'PYLN_FRM_CD'
+                 LEFT OUTER JOIN TB_CD STAT
+                                 ON STAT.CD = SI.AI_ANLYS_STAT
+                                     AND STAT.CD_GRP = 'INSPECTION_STATUS'
+                 LEFT OUTER JOIN TB_SAFETY_INSPT_USER SIU
+                                 ON SI.INSPT_SNO = SIU.INSPT_SNO
+                 LEFT OUTER JOIN TB_USER U
+                                 ON U.USER_ID = SIU.USER_ID
+
+         WHERE SI.INSPT_SNO
+            IN
+         <foreach collection="inspectionSnoList" item="inspectionSno" separator="," open="(" close=")">
+             #{inspectionSno}
+         </foreach>
+        GROUP BY SIT.SRFC_CD, SI.INSPT_SNO, BRCH_CD.CD_NM, PYLN_TYPE.CD_NM, STAT.CD_NM
+    </select>
+
+    <select id="selectTotalResult" parameterType="kr.co.dsi.business.inspection.dto.req.InspectionStatusReadReqDto" resultType="kr.co.dsi.business.inspection.dto.res.InspectionTotalResDto">
+        SELECT COALESCE(sum(UNSCREWED_RED),0) as TOTAL_UNSCREWED_RED
+             , COALESCE(sum(UNSCREWED_YELLOW),0) as TOTAL_UNSCREWED_YELLOW
+             , COALESCE(sum(RUSTY_RED),0) as TOTAL_RUSTY_RED
+             , COALESCE(sum(RUSTY_YELLOW),0) as TOTAL_RUSTY_YELLOW
+             , COALESCE(sum(NORMAL),0) as TOTAL_NORMAL
+          FROM TB_IMG_INSPT_RSLT
+         WHERE INSPT_SNO = #{inspectionSno}
+    </select>
+
+    <update id="updateInspectionProgress" parameterType="kr.co.dsi.business.result.dto.req.InspectionProgressReqDto">
+        update TB_SAFETY_INSPT
+           set MODEL_STUS = #{dataStatus}
+             , MODEL_PRGS = #{dataProgress}
+             <if test="aiAnalysisStatus != null and aiAnalysisStatus != ''">
+                 , AI_ANLYS_STAT = #{aiAnalysisStatus, jdbcType=VARCHAR}
+                 , FAIL_REASON = #{failReason}
+             </if>
+         where INSPT_SNO = #{inspectionSno}
+    </update>
+
+    <delete id="deleteTempInspectImgResultList" parameterType="kr.co.dsi.business.inspection.dto.req.InspectionStatusUpdReqDto">
+        delete from TB_IMG_INSPT_RSLT
+        where INSPT_SNO = #{inspectionSno}
+    </delete>
+    
+    <insert id="insertTempInspectImgResultList" parameterType="kr.co.dsi.business.inspection.dto.req.InspectionStatusTempUpdReqDto">
+        INSERT INTO TB_IMG_INSPT_RSLT
+            (INSPT_SNO
+            , IMG_ID
+            , ALTTD
+            , REG_DT
+            , REG_USER_ID
+            , UPD_DT
+            , UPD_USER_ID)
+        values
+        <foreach collection="imageList" item="item" separator=",">
+            ( #{inspectionSno}
+            , #{item.imgId}
+            , #{item.alttd}
+            , CURRENT_TIMESTAMP
+            , #{userId}
+            , CURRENT_TIMESTAMP
+            , #{userId}
+            )
+        </foreach>
+        ON DUPLICATE KEY UPDATE ALTTD = VALUES(alttd), UPD_DT = CURRENT_TIMESTAMP, UPD_USER_ID = #{userId}
+    </insert>
+    
+    <select id="selectInspectionImgIdList" parameterType="kr.co.dsi.business.inspection.dto.req.InspectionStatusReadReqDto" resultType="kr.co.dsi.business.inspection.dto.req.InspectionImgTempDto">
+        select IMG_ID
+             , ALTTD
+          from TB_IMG_INSPT_RSLT
+         where INSPT_SNO = #{inspectionSno}
+    </select>
+
+    <update id="updateImgResult" parameterType="kr.co.dsi.business.result.dto.req.InspectionImgResultCrteReqDto">
+        update TB_IMG_INSPT_RSLT
+          set BBOX_LINK         = #{bbox_path}
+            , TRGT              = #{total_targets}
+            , NORMAL            = #{normal}
+            , RUSTY_RATIO       = #{rusty_ratio}
+            , RUSTY_YELLOW      = #{rusty_yellow}
+            , RUSTY_RED         = #{rusty_red}
+            , UNSCREWED_YELLOW  = #{unscrewed_yellow}
+            , UNSCREWED_RED     = #{unscrewed_red}
+            , MISSING           = #{missing}
+            , MEASURE_LEVEL     = #{measureLevel}
+            , NOTE              = #{note}
+            , REG_DT            = CURRENT_TIMESTAMP
+            , REG_USER_ID       = #{userId}
+            , UPD_DT            = CURRENT_TIMESTAMP
+            , UPD_USER_ID       = #{userId}
+        where INSPT_SNO = #{inspectionSno}
+          and IMG_ID = #{img_id}
+    </update>
+</mapper>

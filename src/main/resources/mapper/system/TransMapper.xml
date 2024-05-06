@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="kr.co.dsi.system.trans">
+    <insert id="insertTrans" parameterType="kr.co.dsi.system.trans.entity.Trans" >
+        INSERT INTO dsi.TB_TRANS
+            (LNK_ID
+            , LOCALE_CD
+            , TRANS_MSG)
+        VALUES (
+                #{lnkId, jdbcType=VARCHAR}
+                ,#{localeCd, jdbcType=VARCHAR}
+                ,#{transMsg, jdbcType=VARCHAR}
+               )
+        ON DUPLICATE KEY UPDATE TRANS_MSG = #{transMsg, jdbcType=VARCHAR}
+    </insert>
+
+    <select id="selectTrans" parameterType="kr.co.dsi.system.trans.dto.req.TransReadReqDto" resultType="kr.co.dsi.system.trans.dto.res.TransReadResDto">
+        SELECT LNK_ID, LOCALE_CD, TRANS_MSG
+        FROM dsi.TB_TRANS
+        WHERE LNK_ID = #{lnkId}
+          <if test="localeCd != null and localeCd != ''">
+              AND LOCALE_CD = #{localeCd}
+          </if>
+    </select>
+
+    <update id="updateTrans" parameterType="kr.co.dsi.system.trans.entity.Trans">
+        UPDATE dsi.TB_TRANS
+           SET TRANS_MSG = #{transMsg, jdbcType=VARCHAR}
+        WHERE LNK_ID = #{lnkId}
+          AND LOCALE_CD = #{localeCd}
+    </update>
+
+    <delete id="deleteTrans" parameterType="java.lang.String">
+        DELETE FROM dsi.TB_TRANS
+         WHERE LNK_ID =#{lnkId}
+    </delete>
+
+    <delete id="deleteTransList" parameterType="java.util.List">
+        DELETE FROM dsi.TB_TRANS
+         WHERE LNK_ID IN
+            <foreach collection="list" item="item" index="index" separator="," open="(" close=")">
+                #{item}
+            </foreach>
+    </delete>
+</mapper>

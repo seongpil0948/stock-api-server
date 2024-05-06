@@ -1,0 +1,904 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="kr.co.dsi.system.role.dao.RoleDao">
+
+	<select id="getLginUsrRole" parameterType="java.lang.String" resultType="kr.co.dsi.system.role.dto.RoleUsrDto">
+		/*
+		SQL ID : co.kr.rp.mgmt.dao.RoleDao.getUsrRole
+		SQL 명: 특정 사용자에게 할당된 역할 목록 조회
+		*/
+		SELECT
+			a.role_id		as role_id/* 역할 아이디 */
+		FROM TB_ROLE_USER_MAPG a
+				 INNER JOIN TB_ROLE role on a.role_id = role.role_id
+				 INNER JOIN TB_USER usr on a.USER_ID = usr.USER_ID and usr.STUS_CD = 'ACTIVE'
+		WHERE
+			a.USER_ID = #{usrId}
+	</select>
+
+	<select id="getRoleMenuScrnRoleUse" parameterType="java.util.List" resultType="kr.co.dsi.system.role.dto.RoleMenuScrnMapg">
+		/*
+		SQL ID : co.kr.rp.mgmt.dao.RoleDao.getRoleMenuScrnRoleUse
+		SQL 명 : 사용자의 역할-메뉴-화면 매핑 정보 조회(모든 사용자 용도)
+		*/
+		SELECT
+		result.menu_id          /* 메뉴 아이디 */
+		,case when result.hpos_menu_id is null then '#' else result.hpos_menu_id end as hpos_menu_id				/* 상위 메뉴 아이디 */
+		,result.menu_idx        /* 메뉴 순서 */
+		,result.menu_order		/* 메뉴 트리 정렬 순서 */
+		,result.menu_nm         /* 메뉴 명 */
+		,result.lvl             /* 레벨 */
+		,result.menu_path       /* 메뉴 경로 */
+		,result.menu_url		/* 메뉴 링크 */
+		,map.main_scrn_yn    /* 메인 화면 여부 */
+		FROM (
+			WITH RECURSIVE cte AS (
+				SELECT
+					mnu.menu_id
+					, mnu.menu_nm
+					, mnu.hpos_menu_id
+					, 1 AS lvl
+					, mnu.menu_nm AS menu_path
+					, CONVERT(menu_idx, CHAR) AS menu_order
+					, mnu.menu_path AS menu_url
+					, mnu.menu_idx
+				FROM TB_MENU mnu
+				INNER JOIN (
+					SELECT
+					map.menu_id
+					FROM TB_ROLE_MENU_MAPG map
+					INNER JOIN TB_ROLE role on map.role_id = role.role_id AND role.use_yn = 'Y'
+					WHERE
+					map.role_id IN
+					<foreach collection="list" item="item" index="index" separator="," open="(" close=")">
+		                 #{item.roleId}
+		            </foreach>
+					GROUP BY map.menu_id
+				) userMenus ON mnu.menu_id = userMenus.menu_id
+				WHERE
+				mnu.use_yn = 'Y'
+				AND hpos_menu_id IS NULL
+
+				UNION ALL
+
+				SELECT
+					b.menu_id
+					, b.menu_nm
+					, b.hpos_menu_id
+					, c.lvl+1 AS lvl
+					, CONCAT(c.menu_path,' > ', b.menu_nm) AS menu_path
+					, CONCAT(c.menu_order,',', b.menu_idx) AS menu_order
+					, b.menu_path AS menu_url
+					, b.menu_idx
+				FROM TB_MENU b
+				INNER JOIN (
+					SELECT
+					map.menu_id
+					FROM TB_ROLE_MENU_MAPG map
+					INNER JOIN TB_ROLE role on map.role_id = role.role_id AND role.use_yn = 'Y'
+					WHERE
+					map.role_id IN
+					<foreach collection="list" item="item" index="index" separator="," open="(" close=")">
+		                 #{item.roleId}
+		            </foreach>
+					GROUP BY map.menu_id
+				) userMenus ON b.menu_id = userMenus.menu_id AND b.use_yn = 'Y'
+				INNER JOIN cte c ON b.hpos_menu_id = c.menu_id
+			)
+			SELECT
+				menu_id            /* 메뉴 아이디 */
+				, menu_nm          /* 메뉴 명 */
+				, hpos_menu_id     /* 상위 메뉴 아이디 */
+				, lvl              /* 레빌 */
+				, menu_path        /* 메뉴 경로 */
+				, menu_order	   /* 메뉴 트리 정렬 기준 */
+				, menu_url			/* 메뉴 URL */
+				, menu_idx         /* 메뉴 순서 */
+			FROM cte a
+		) result
+		LEFT OUTER JOIN TB_ROLE_MENU_MAPG map ON result.menu_id = map.MENU_ID
+		AND map.role_id IN
+			<foreach collection="list" item="item" index="index" separator="," open="(" close=")">
+                 #{item.roleId}
+            </foreach>
+		ORDER by result.menu_idx, result.menu_order
+	</select>
+
+	<select id="getRoleApiAuthMapgForSpringSecurity" parameterType="java.lang.String" resultType="kr.co.dsi.system.role.dto.RoleApiAuthMapg">
+		/*
+		SQL ID : co.kr.rp.mgmt.dao.RoleDao.getRoleApiAuthMapg
+		SQL 명: 스프링 시큐리티 관련 역할-api-권한 매핑 전체 정보 조회
+		*/
+		SELECT
+			TRAAM.ROLE_ID		/* 역할 아이디 */
+			 , TRAAM.AUTH_ID	/* 권한 아이디 */
+			 , TRAAM.API_ID		/* API 아이디 */
+			 , TA.API_NM		/* API 명 */
+			 , TA.API_PATH_PTRN	/* API URL 패턴 */
+		FROM TB_ROLE_API_AUTH_MAPG TRAAM
+		INNER JOIN TB_API TA
+		ON TRAAM.API_ID = TA.API_ID
+			AND TA.USE_YN = 'Y'
+		INNER JOIN TB_ROLE TR
+		ON TR.ROLE_ID = TRAAM.ROLE_ID
+			AND TR.USE_YN = 'Y'
+	</select>
+
+	<select id="getRoleApiMapgForSpringSecurity" resultType="kr.co.dsi.system.role.dto.RoleApiAuthMapg">
+		/*
+		SQL ID : co.kr.rp.mgmt.dao.RoleDao.getRoleApiMapgForSpringSecurity
+		SQL 명: 스프링 시큐리티 관련 역할-api 매핑 전체 정보 조회
+		*/
+		SELECT tram.ROLE_ID as ROLE_ID
+		     , GROUP_CONCAT(ta.API_PATH_PTRN) as API_PATH_PTRN
+		FROM TB_API ta
+				 INNER JOIN TB_ROLE_API_MAPG tram
+							ON ta.API_ID = tram.API_ID
+								AND ta.USE_YN = 'Y'
+				 INNER JOIN TB_ROLE tr
+							ON tr.ROLE_ID = tram.ROLE_ID
+								AND tr.USE_YN = 'Y'
+		GROUP BY tram.ROLE_ID
+	</select>
+
+	<!--
+	#######################################################################################
+	######################### 아래는 CRUD 기본 기능 관련 ########################################
+	#######################################################################################
+	-->
+
+	<select id="getRoleMenuScrn" parameterType="java.util.List" resultType="kr.co.dsi.system.role.dto.RoleMenuScrnMapg">
+		/*
+		SQL ID : co.kr.rp.mgmt.dao.RoleDao.getRoleMenuScrn
+		SQL 명 : 사용자의 역할-메뉴-화면 매핑 정보 조회(관리자 시스템용도)
+		*/
+		SELECT
+		result.menu_id          /* 메뉴 아이디 */
+		,case when result.hpos_menu_id is null then '#' else result.hpos_menu_id end as hpos_menu_id				/* 상위 메뉴 아이디 */
+		,result.menu_idx        /* 메뉴 순서 */
+		,result.menu_order		/* 메뉴 트리 정렬 순서 */
+		,result.menu_nm         /* 메뉴 명 */
+		,result.lvl             /* 레벨 */
+		,result.menu_path       /* 메뉴 경로 */
+		,result.menu_url		/* 메뉴 링크 */
+		,map.main_scrn_yn    /* 메인 화면 여부 */
+		FROM (
+			WITH RECURSIVE cte AS (
+				SELECT
+					mnu.menu_id
+					, mnu.menu_nm
+					, mnu.hpos_menu_id
+					, 1 AS lvl
+					, mnu.menu_nm AS menu_path
+					, CONVERT(menu_idx, CHAR) AS menu_order
+					, mnu.menu_path AS menu_url
+					, mnu.menu_idx
+				FROM TB_MENU mnu
+				INNER JOIN (
+					SELECT
+					map.menu_id
+					FROM TB_ROLE_MENU_MAPG map
+					INNER JOIN TB_ROLE role on map.role_id = role.role_id
+					WHERE
+					map.role_id IN
+					<foreach collection="list" item="item" index="index" separator="," open="(" close=")">
+		                 #{item.roleId}
+		            </foreach>
+					GROUP BY map.menu_id
+				) userMenus ON mnu.menu_id = userMenus.menu_id
+				WHERE
+				hpos_menu_id IS NULL
+
+				UNION ALL
+
+				SELECT
+					b.menu_id
+					, b.menu_nm
+					, b.hpos_menu_id
+					, C.lvl+1 AS lvl
+					, CONCAT(c.menu_path,' > ', b.menu_nm) AS menu_path
+					, CONCAT(c.menu_order,',', b.menu_idx) AS menu_order
+					, b.menu_path AS menu_url
+					, b.menu_idx
+				FROM TB_MENU b
+				INNER JOIN (
+					SELECT
+					map.menu_id
+					FROM TB_ROLE_MENU_MAPG map
+					INNER JOIN TB_ROLE role on map.role_id = role.role_id
+					WHERE
+					map.role_id IN
+					<foreach collection="list" item="item" index="index" separator="," open="(" close=")">
+		                 #{item.roleId}
+		            </foreach>
+					GROUP BY map.menu_id
+				) userMenus ON b.menu_id = userMenus.menu_id
+				INNER JOIN cte c ON b.hpos_menu_id = c.menu_id
+			)
+			SELECT
+				menu_id            /* 메뉴 아이디 */
+				, menu_nm          /* 메뉴 명 */
+				, hpos_menu_id     /* 상위 메뉴 아이디 */
+				, lvl              /* 레빌 */
+				, menu_path        /* 메뉴 경로 */
+				, menu_order	   /* 메뉴 트리 정렬 기준 */
+				, menu_url
+				, menu_idx         /* 메뉴 순서 */
+			FROM cte a
+		) result
+		LEFT OUTER JOIN TB_ROLE_MENU_MAPG map ON result.menu_id = map.MENU_ID
+			AND map.role_id IN
+			<foreach collection="list" item="item" index="index" separator="," open="(" close=")">
+                 #{item.roleId}
+            </foreach>
+		ORDER by result.menu_order ASC
+	</select>
+
+	<select id="selectRoleCount" parameterType="kr.co.dsi.system.role.dto.req.RoleReadReqDto" resultType="java.lang.Integer">
+		/*
+		SQL ID : dao.role.co.kr.b2b.idp.system.RoleDao.selectRoleCount
+		SQL 명: 역할 목록 카운트 조회
+		*/
+		SELECT COUNT(1)
+		  FROM TB_ROLE
+		 WHERE 1=1
+		   AND DEL_YN = 'N'
+		<if test="searchType != null and searchType != '' and keyword != null and keyword != ''">
+			<choose>
+				<when test="searchType == 'ALL'">
+					AND (
+					ROLE_ID LIKE CONCAT('%', REGEXP_REPLACE(#{keyword}, '(\_|\%)', '\\\\\\1'), '%') OR
+					ROLE_NM LIKE CONCAT('%', REGEXP_REPLACE(#{keyword}, '(\_|\%)', '\\\\\\1'), '%')
+					)
+				</when>
+				<when test="searchType == 'ROLE_ID'">
+					AND ROLE_ID LIKE CONCAT('%', REGEXP_REPLACE(#{keyword}, '(\_|\%)', '\\\\\\1'), '%')
+				</when>
+				<when test="searchType == 'ROLE_NM'">
+					AND ROLE_NM LIKE CONCAT('%', REGEXP_REPLACE(#{keyword}, '(\_|\%)', '\\\\\\1'), '%')
+				</when>
+			</choose>
+		</if>
+		<if test="useYn != null and useYn != ''">
+			<choose>
+				<when test="useYn == 'ALL'">
+				</when>
+				<otherwise>
+					AND USE_YN = #{useYn}
+				</otherwise>
+			</choose>
+		</if>
+	</select>
+
+	<select id="selectRoleList" parameterType="kr.co.dsi.system.role.dto.req.RoleReadReqDto" resultType="kr.co.dsi.system.role.dto.res.RoleReadResDto">
+		/*
+		SQL ID : dao.role.co.kr.b2b.idp.system.RoleDao.selectRoleList
+		SQL 명: 역할 목록 조회
+		*/
+		SELECT ROW_NUMBER() OVER(ORDER BY REG_DT DESC) AS no
+			 , ROLE_ID
+			 , ROLE_NM AS ROLE_NAME
+			 , ROLE_DSCR AS ROLE_DESCRIPTION
+			 , USE_YN
+			 , DATE_FORMAT(REG_DT, '%Y-%m-%d') AS CREATE_DATE
+		  FROM TB_ROLE
+		 WHERE 1=1
+		   AND DEL_YN = 'N'
+			<if test="searchType != null and searchType != '' and keyword != null and keyword != ''">
+				<choose>
+					<when test="searchType == 'ALL'">
+						AND (
+						ROLE_ID LIKE CONCAT('%', REGEXP_REPLACE(#{keyword}, '(\_|\%)', '\\\\\\1'), '%') OR
+						ROLE_NM LIKE CONCAT('%', REGEXP_REPLACE(#{keyword}, '(\_|\%)', '\\\\\\1'), '%')
+							)
+					</when>
+					<when test="searchType == 'ROLE_ID'">
+						AND ROLE_ID LIKE CONCAT('%', REGEXP_REPLACE(#{keyword}, '(\_|\%)', '\\\\\\1'), '%')
+					</when>
+					<when test="searchType == 'ROLE_NM'">
+						AND ROLE_NM LIKE CONCAT('%', REGEXP_REPLACE(#{keyword}, '(\_|\%)', '\\\\\\1'), '%')
+					</when>
+				</choose>
+			</if>
+			<if test="useYn != null and useYn != ''">
+				<choose>
+					<when test="useYn == 'ALL'">
+					</when>
+					<otherwise>
+						AND USE_YN = #{useYn}
+					</otherwise>
+				</choose>
+			</if>
+		LIMIT #{rowStart}, #{limit}
+	</select>
+
+	<select id="selectRole" parameterType="kr.co.dsi.system.role.dto.req.RoleReadReqDto" resultType="kr.co.dsi.system.role.dto.res.RoleReadResDto">
+		/*
+		SQL ID : dao.role.co.kr.b2b.idp.system.RoleDao.selectRole
+		SQL 명: 역할 단건 조회
+		*/
+		SELECT ROLE_ID
+			 , ROLE_NM AS ROLE_NAME
+			 , ROLE_DSCR AS ROLE_DESCRIPTION
+			 , DOMAIN_DIVS_CD AS ROLE_TYPE
+			 , USE_YN
+			 , CONCAT(REG_USER_ID, ' / ', DATE_FORMAT(REG_DT, '%Y-%m-%d %H:%i')) AS CREATE_INFO
+			 , CONCAT(UPD_USER_ID, ' / ', DATE_FORMAT(UPD_DT, '%Y-%m-%d %H:%i')) AS UPDATE_INFO
+		FROM TB_ROLE
+		<where>
+			ROLE_ID = #{roleId}
+		</where>
+	</select>
+
+	<select id="selectAssignMenuRoleList" parameterType="kr.co.dsi.system.role.dto.req.RoleReadReqDto" resultType="kr.co.dsi.system.role.dto.res.MenuApiMapgResDto">
+        /*
+        SQL ID : kr.co.dsi.system.role.dao.RoleDao.selectAssignMenuRoleList
+        SQL 명: 메뉴 역할 할당 목록 조회
+        */
+        SELECT AMM.MENU_ID
+        , M.MENU_NM
+        , IFNULL(AMM.MAIN_SCRN_YN, 'N') AS ASSIGN_YN
+        FROM TB_ROLE_MENU_MAPG AMM
+        LEFT JOIN TB_MENU M
+        ON AMM.MENU_ID = M.MENU_ID
+        WHERE AMM.ROLE_ID = #{roleId}
+    </select>
+
+	<insert id="insertRole" parameterType="kr.co.dsi.system.role.entity.Role">
+        /*
+        SQL ID : dao.role.co.kr.b2b.idp.system.RoleDao.insertRole
+        SQL 명: 역할 등록
+        */
+        INSERT
+        INTO TB_ROLE (
+        ROLE_ID
+        , DEL_YN
+        , USE_YN
+        , DOMAIN_DIVS_CD
+        , ROLE_NM
+        , ROLE_DSCR
+        , REG_DT
+        , REG_USER_ID
+        )
+        VALUES (
+        #{roleId}
+        , 'N'
+        , #{useYn}
+        , 'MGMT'
+        , #{roleNm}
+        , #{roleDscr}
+        , CURRENT_TIMESTAMP()
+        , #{loginId}
+        )
+    </insert>
+
+
+	<update id="updateRole" parameterType="kr.co.dsi.system.role.entity.Role">
+		/*
+		SQL ID : dao.role.co.kr.b2b.idp.system.RoleDao.updateRole
+		SQL 명: 역할 수정
+		*/
+		UPDATE TB_ROLE
+		<set>
+			<if test="roleNm != null">
+				ROLE_NM = #{roleNm},
+			</if>
+			<if test="roleDscr != null">
+				ROLE_DSCR = #{roleDscr},
+			</if>
+			<if test="useYn != null">
+				USE_YN = #{useYn},
+			</if>
+			UPD_DT = CURRENT_TIMESTAMP(),
+			UPD_USER_ID = #{loginId}
+		</set>
+		WHERE ROLE_ID = #{roleId}
+	</update>
+
+	<delete id="deleteRole" parameterType="kr.co.dsi.system.role.entity.Role">
+        /*
+        SQL ID : kr.co.dsi.system.role.dao.RoleDao.deleteRole
+        SQL 명: 역할 삭제
+        */
+        UPDATE TB_ROLE
+        SET DEL_YN = 'Y'
+        , USE_YN = 'N'
+        , UPD_DT = CURRENT_TIMESTAMP()
+        , UPD_USER_ID = #{loginId}
+        WHERE ROLE_ID = #{roleId}
+    </delete>
+
+	<select id="selectRoleMenuScrnMapgCount" parameterType="kr.co.dsi.system.role.dto.req.RoleMenuScrnMapgReadReqDto" resultType="java.lang.Integer">
+		/*
+		SQL ID : dao.role.co.kr.b2b.idp.system.RoleDao.selectRoleMenuScrnMapg
+		SQL 명: 역할-메뉴-화면 매핑 정보 조회
+		*/
+		SELECT COUNT(1)
+		  FROM TB_ROLE_MENU_MAPG
+		<where>
+			<if test="roleId != null">
+				AND ROLE_ID = #{roleId}
+			</if>
+			<if test="menuId != null">
+				AND MENU_ID = #{menuId}
+			</if>
+		</where>
+	</select>
+
+	<select id="selectRoleMenuScrnMapg" parameterType="kr.co.dsi.system.role.dto.req.RoleMenuScrnMapgReadReqDto" resultType="kr.co.dsi.system.role.dto.res.RoleMenuScrnMapgReadResDto">
+		/*
+		SQL ID : dao.role.co.kr.b2b.idp.system.RoleDao.selectRoleMenuScrnMapg
+		SQL 명: 역할-메뉴-화면 매핑 정보 조회
+		*/
+		SELECT ROLE_ID
+			 , MENU_ID
+		 	 , MAIN_SCRN_YN AS MAIN_SCREEN_YN
+		FROM TB_ROLE_MENU_MAPG
+		<where>
+			<if test="roleId != null">
+				AND ROLE_ID = #{roleId}
+			</if>
+			<if test="menuId != null">
+				AND MENU_ID = #{menuId}
+			</if>
+			<if test="mainScreenYn != null">
+				AND MAIN_SCRN_YN = #{mainScreenYn}
+			</if>
+		</where>
+		ORDER BY ROLE_ID, MENU_ID DESC
+	</select>
+
+	<select id="getRoleMenuScrnMapgBySelective" parameterType="kr.co.dsi.system.role.entity.RoleMenuScrnMapgEntity" resultType="kr.co.dsi.system.role.entity.RoleMenuScrnMapgEntity">
+		/*
+		SQL ID : dao.role.co.kr.b2b.idp.system.RoleDao.getRoleMenuScrnMapgBySelective
+		SQL 명: 역할-메뉴-화면 매핑 정보 조회(entity)
+		*/
+		SELECT ROLE_ID
+			 , MENU_ID
+			 , MAIN_SCRN_YN
+		  FROM TB_ROLE_MENU_MAPG
+		<where>
+			<if test="roleId != null">
+				AND ROLE_ID = #{roleId}
+			</if>
+			<if test="menuId != null">
+				AND MENU_ID = #{menuId}
+			</if>
+			<if test="mainScrnYn != null">
+				AND MAIN_SCRN_YN = #{mainScrnYn}
+			</if>
+		</where>
+	</select>
+
+	<insert id="insertRoleMenuScrnMapgList" parameterType="java.util.List">
+		/*
+		SQL ID : dao.role.co.kr.b2b.idp.system.RoleDao.insertRoleMenuScrnMapgList
+		SQL 명: 역할-메뉴-화면 매핑 정보 등록
+		*/
+		INSERT
+		  INTO TB_ROLE_MENU_MAPG (
+			 ROLE_ID
+			 , MENU_ID
+			 , MAIN_SCRN_YN
+			 , REG_DT
+			 , REG_USER_ID
+			 , UPD_DT
+			 , UPD_USER_ID
+			 )
+		VALUES
+		<foreach collection="list" item="item" separator=",">
+			(
+			 #{item.roleId}
+			 , #{item.menuId}
+			 , IFNULL(#{item.mainScrnYn}, 'N')
+			 , CURRENT_TIMESTAMP()
+			 , #{item.loginId}
+			 , CURRENT_TIMESTAMP()
+			 , #{item.loginId}
+		)
+		</foreach>
+	</insert>
+
+	<delete id="deleteRoleMenuScrnMapg" parameterType="kr.co.dsi.system.role.entity.RoleMenuScrnMapgEntity">
+        /*
+        SQL ID : kr.co.dsi.system.role.dao.RoleDao.deleteRoleMenuScrnMapg
+        SQL 명: 역할-메뉴-화면 매핑 정보 삭제
+        */
+        DELETE
+        FROM TB_ROLE_MENU_MAPG
+        WHERE ROLE_ID = #{roleId}
+        AND MENU_ID = #{menuId}
+    </delete>
+
+	<delete id="deleteRoleMenuScrnMapgByRoleId" parameterType="java.lang.String">
+        /*
+        SQL ID : kr.co.dsi.system.role.dao.RoleDao.deleteRoleMenuScrnMapgByRoleId
+        SQL 명: 역할 아이디 기준으로 역할-메뉴-화면 매핑 정보 삭제
+        */
+        DELETE
+        FROM TB_ROLE_MENU_MAPG
+        WHERE ROLE_ID = #{roleId}
+    </delete>
+
+	<insert id="insertRoleApiAuthMapgList" parameterType="java.util.List">
+		/*
+		SQL ID : dao.role.co.kr.b2b.idp.system.RoleDao.insertRoleApiAuthMapg
+		SQL 명: 역할-api-권한 상세 매핑 정보 등록
+		*/
+		INSERT
+		  INTO TB_ROLE_API_AUTH_MAPG (
+		     AUTH_ID
+		     , API_ID
+		     , ROLE_ID
+		     , REG_DT
+		     , REG_USER_ID
+		     , UPD_DT
+		     , UPD_USER_ID
+			 )
+		VALUES
+		<foreach collection="list" item="item" separator=",">
+			(
+			 #{item.authId}
+			 , #{item.apiId}
+			 , #{item.roleId}
+			 , CURRENT_TIMESTAMP()
+			 , #{item.loginId}
+			 , CURRENT_TIMESTAMP()
+			 , #{item.loginId}
+			)
+		</foreach>
+	</insert>
+
+	<delete id="deleteRoleApiAuthMapg" parameterType="kr.co.dsi.system.role.entity.RoleApiAuthMapgEntity">
+        /*
+        SQL ID : kr.co.dsi.system.role.dao.RoleDao.deleteRoleApiAuthMapg
+        SQL 명: 역할-api-권한 매핑 정보 삭제
+        */
+        DELETE
+        FROM TB_ROLE_API_AUTH_MAPG
+        WHERE ROLE_ID = #{roleId}
+        AND API_ID = #{apiId}
+    </delete>
+
+	<delete id="deleteRoleApiAuthMapgByRoleId" parameterType="java.lang.String">
+        /*
+        SQL ID : kr.co.dsi.system.role.dao.RoleDao.deleteRoleApiAuthMapgByRoleId
+        SQL 명: 역할 아이디 기준으로 역할-api-권한 매핑 정보 삭제
+        */
+        DELETE
+        FROM TB_ROLE_API_AUTH_MAPG
+        WHERE ROLE_ID = #{roleId}
+    </delete>
+
+	<delete id="deleteRoleApiAuthMapgList" parameterType="java.util.List">
+		/*
+		SQL ID : co.kr.rp.mgmt.menu.dao.RoleDao.deleteRoleApiAuthMapgList
+		SQL 명: 역할-api-권한 매핑 정보 삭제
+		*/
+		DELETE
+		  FROM TB_ROLE_API_AUTH_MAPG
+		 WHERE
+		<foreach collection="list" item="item" index="index" separator=" OR " open="(" close=")">
+			ROLE_ID = #{item.roleId}
+			AND API_ID = #{item.apiId}
+			AND AUTH_ID = #{item.authId}
+		</foreach>
+	</delete>
+
+	<insert id="insertRoleUserMapgList" parameterType="java.util.List">
+		/*
+		SQL ID : dao.role.co.kr.b2b.idp.system.RoleDao.insertRoleUsrMapg
+		SQL 명: 역할-사용자 매핑 정보 등록
+		*/
+		INSERT
+		  INTO TB_ROLE_USER_MAPG (
+		  	 ROLE_ID
+			 , USER_ID
+			 , REG_DT
+			 , REG_USER_ID
+			 , UPD_DT
+			 , UPD_USER_ID
+			 )
+		VALUES
+		<foreach collection="list" item="item" separator=" , ">
+			(
+			 #{item.roleId}
+			 , #{item.userId}
+			 , CURRENT_TIMESTAMP()
+			 , #{item.loginId}
+			 , CURRENT_TIMESTAMP()
+			 , #{item.loginId}
+			)
+		</foreach>
+	</insert>
+
+	<delete id="deleteAllRoleAssigned" parameterType="java.lang.String">
+		/*
+		SQL ID : co.kr.rp.mgmt.menu.dao.RoleDao.deleteAllRoleAssigned
+		SQL 명: 사용자 아이디 기준 역할-사용자 매핑 정보 모두 삭제
+		*/
+		DELETE FROM TB_ROLE_USER_MAPG
+		WHERE
+			USER_ID = #{userId}
+	</delete>
+
+	<delete id="deleteAllUsrAssigned" parameterType="java.lang.String">
+		/*
+		SQL ID : co.kr.rp.mgmt.menu.dao.RoleDao.deleteAllRoleAssigned
+		SQL 명: 역할 기준 역할-사용자 매핑 정보 모두 삭제
+		*/
+		DELETE FROM tb_role_usr_mapg
+		WHERE
+			role_id = #{roleId}
+	</delete>
+
+	<delete id="deleteRoleUsrMapgList" parameterType="java.util.List">
+		/*
+		SQL ID : co.kr.rp.mgmt.menu.dao.RoleDao.deleteRoleUsrMapgList
+		SQL 명: 역할-사용자 매핑 목록 정보 모두 삭제
+		*/
+		DELETE
+		  FROM TB_ROLE_USER_MAPG
+		 WHERE
+		<foreach collection="list" item="item" index="index" separator=" OR " open="(" close=")">
+		   USER_ID = #{item.userId}
+		   AND ROLE_ID = #{item.roleId}
+		</foreach>
+	</delete>
+
+	<insert id="insertRoleMenuScrnMapgHistList" parameterType="java.util.List">
+		/*
+		SQL ID : dao.role.co.kr.b2b.idp.system.RoleDao.insertRoleMenuScrnMapgHistList
+		SQL 명: 역할-메뉴-화면 매핑 이력 정보 등록
+		*/
+		INSERT INTO tb_role_menu_scrn_mapg_hist (
+			role_id
+			, menu_id
+			, scrn_id
+			, main_scrn_yn
+			, prss_divs
+			, crte_dt
+			, crte_usr_id
+		)
+		VALUES
+		<foreach collection="list" item="item" separator=" , ">
+		(
+			#{item.roleId, jdbcType=VARCHAR}
+			, #{item.menuId, jdbcType=VARCHAR}
+			, #{item.scrnId, jdbcType=VARCHAR}
+			, #{item.mainScrnYn, jdbcType=VARCHAR}
+			, #{item.prssDivs, jdbcType=VARCHAR}
+			, current_timestamp()
+			, #{item.crteUsrId, jdbcType=VARCHAR}
+		)
+		</foreach>
+	</insert>
+
+	<insert id="insertRoleApiAuthMapgHistList" parameterType="java.util.List">
+		/*
+		SQL ID : dao.role.co.kr.b2b.idp.system.RoleDao.insertRoleApiAuthMapgHistList
+		SQL 명: 역할-api-권한 매핑 이력 정보 등록
+		*/
+		INSERT INTO TB_ROLE_API_AUTH_MAPG_hist (
+			role_id
+			, api_id
+			, auth_id
+			, prss_divs
+			, crte_dt
+			, crte_usr_id
+		)
+		VALUES
+		<foreach collection="list" item="item" separator=" , ">
+		(
+			#{item.roleId, jdbcType=VARCHAR}
+			, #{item.apiId, jdbcType=VARCHAR}
+			, #{item.authId, jdbcType=VARCHAR}
+			, #{item.prssDivs, jdbcType=VARCHAR}
+			, current_timestamp()
+			, #{item.crteUsrId, jdbcType=VARCHAR}
+		)
+		</foreach>
+	</insert>
+
+	<insert id="insertRoleUsrMapgHistList" parameterType="java.util.List">
+		/*
+		SQL ID : dao.role.co.kr.b2b.idp.system.RoleDao.insertRoleUsrMapgHistList
+		SQL 명: 역할-사용자 매핑 이력 정보 등록
+		*/
+		INSERT INTO tb_role_usr_mapg_hist (
+			role_id
+			, usr_id
+			, prss_divs
+			, crte_dt
+			, crte_usr_id
+		)
+		VALUES
+		<foreach collection="list" item="item" separator=" , ">
+		(
+			#{item.roleId, jdbcType=VARCHAR}
+			, #{item.usrId, jdbcType=VARCHAR}
+			, #{item.prssDivs, jdbcType=VARCHAR}
+			, current_timestamp()
+			, #{item.crteUsrId, jdbcType=VARCHAR}
+		)
+		</foreach>
+	</insert>
+
+	<select id="getRoleUsrMapngByRole" parameterType="java.lang.String" resultType="kr.co.dsi.system.role.entity.RoleUsrMapgEntity">
+		/*
+		SQL ID : co.kr.rp.mgmt.dao.RoleDao.getRoleUsrMapngByRole
+		SQL 명: 역할기준 역할-사용자 매핑 정보 조회
+		*/
+		SELECT ROLE_ID
+			 , USER_ID
+		  FROM TB_ROLE_USER_MAPG
+		 WHERE ROLE_ID = #{roleId}
+	</select>
+
+	<select id="getRoleUsrMapngByUsr" parameterType="java.lang.String" resultType="kr.co.dsi.system.role.entity.RoleUsrMapgEntity">
+		/*
+		SQL ID : co.kr.rp.mgmt.dao.RoleDao.getRoleUsrMapngByUsr
+		SQL 명: 사용자 기준 역할-사용자 매핑 정보 조회
+		*/
+		SELECT
+			a.role_id as role_id
+			, a.usr_id
+		FROM tb_role_usr_mapg a
+		WHERE
+			a.usr_id = #{usrId}
+	</select>
+
+	<select id="getRoleApiAuthMapgBySelective" parameterType="kr.co.dsi.system.role.entity.RoleApiAuthMapgEntity" resultType="kr.co.dsi.system.role.entity.RoleApiAuthMapgEntity">
+		/*
+		SQL ID : co.kr.rp.mgmt.dao.RoleDao.getRoleApiAuthMapgBySelective
+		SQL 명: 역할-api-권한 매핑 정보 조회
+		*/
+		SELECT ROLE_ID
+			 , API_ID
+			 , AUTH_ID
+		  FROM TB_ROLE_API_AUTH_MAPG
+		<where>
+			<if test="roleId != null">
+					AND ROLE_ID = #{roleId}
+			</if>
+			<if test="apiId != null">
+					AND API_ID = #{apiId}
+			</if>
+			<if test="authId != null">
+					AND AUTH_ID = #{authId}
+			</if>
+		</where>
+	</select>
+
+	<delete id="deleteRoleMenuScrnMapgList" parameterType="java.util.List">
+		/*
+		SQL ID : co.kr.rp.mgmt.menu.dao.RoleDao.deleteRoleMenuScrnMapgList
+		SQL 명: 역할-메뉴-화면 매핑 목록 정보 모두 삭제
+		*/
+		DELETE
+		  FROM TB_ROLE_MENU_MAPG
+		 WHERE
+		<foreach collection="list" item="item" index="index" separator=" OR " open="(" close=")">
+		   ROLE_ID = #{item.roleId}
+		   AND menu_id = #{item.menuId}
+		</foreach>
+	</delete>
+
+	<update id="updateRoleMenuScrnMapg" parameterType="kr.co.dsi.system.role.entity.RoleMenuScrnMapgEntity">
+		/*
+		SQL ID : dao.role.co.kr.b2b.idp.system.RoleDao.updateRoleMenuScrnMapg
+		SQL 명: 역할-메뉴-화면 매핑 수정
+		*/
+		UPDATE tb_role_menu_mapg
+		<set>
+			<if test="mainScrnYn != null">
+				main_scrn_yn = #{mainScrnYn, jdbcType=VARCHAR}
+			</if>
+		</set>
+		WHERE
+			role_id = #{roleId, jdbcType=VARCHAR}
+			AND menu_id = #{menuId, jdbcType=VARCHAR}
+	</update>
+
+	<select id="selectMenuApiMapg" parameterType="string" resultType="kr.co.dsi.system.role.dto.res.MenuApiMapgResDto">
+        /*
+        SQL ID : kr.co.dsi.system.role.dao.RoleDao.selectMenuApiMapg
+        SQL 명: API - 메뉴 매핑 정보 가져오기
+        */
+        SELECT MENU_ID
+        , API_ID
+        FROM TB_MENU_API_MAPG
+        WHERE MENU_ID = #{menuId}
+    </select>
+
+	<select id="selectApiAuth" parameterType="kr.co.dsi.system.role.dto.req.ApiAuthReqDto" resultType="kr.co.dsi.system.role.dto.res.ApiAuthResDto">
+		/*
+		SQL ID : dao.role.co.kr.b2b.idp.system.RoleDao.selectApiAuth
+		SQL 명: API - 메뉴 매핑 정보 가져오기
+		*/
+		SELECT API_ID
+			 , CASE API_ACT_DIVS_CD WHEN 'GET' THEN 'ALL_R'
+			   						WHEN 'POST' THEN 'ALL_W'
+			   						WHEN 'DELETE' THEN 'ALL_D'
+									WHEN 'PUT' THEN 'ALL_W'
+			   END AUTH_ID
+		  FROM TB_API
+		<if test="apiId != null and apiId != ''">
+		 WHERE API_ID = #{apiId}
+		</if>
+	</select>
+
+	<select id="selectCommonMenuApiMapg" resultType="kr.co.dsi.system.role.dto.res.MenuApiMapgResDto">
+        /*
+        SQL ID : kr.co.dsi.system.role.dao.RoleDao.selectCommonMenuApiMapg
+        SQL 명: API - 서비스메뉴의 권한 부여시 공통 매핑 정보 가져오기
+        */
+        SELECT MENU_ID
+        , API_ID
+        FROM TB_MENU_API_MAPG
+        WHERE MENU_ID IN ('UMVCS_MONITOR', 'UMVCS_COMMON')
+    </select>
+
+<!--	<insert id="insertUserUseHist" parameterType="kr.co.dsi.system.common.vo.UserUseHist">-->
+<!--        /*-->
+<!--        SQL ID : kr.co.dsi.system.common.vo.UserUseHist-->
+<!--        SQL 명: 사용자 사용 이력-->
+<!--        */-->
+<!--        INSERT INTO TB_USR_USE_HIST (-->
+<!--        CRTE_DT-->
+<!--        , ACT_DIVS_CD-->
+<!--        , URL-->
+<!--        ) VALUES (-->
+<!--        current_timestamp()-->
+<!--        , (-->
+<!--        SELECT API.API_ACT_DIVS_CD-->
+<!--        FROM TB_ROLE_API_AUTH_MAPG A-->
+<!--        INNER JOIN TB_API API ON A.API_ID = API.API_ID-->
+<!--        AND API.USE_YN = 'Y' AND API.API_KD_CD = #{applicationName}-->
+<!--        INNER JOIN TB_ROLE ROLE ON ROLE.ROLE_ID = A.ROLE_ID-->
+<!--        AND ROLE.USE_YN = 'Y'-->
+<!--        AND ROLE.DOMAIN_DIVS_CD = #{applicationName}-->
+<!--        WHERE A.AUTH_ID = #{authRwd}-->
+<!--        AND API.API_PATH_PTRN = #{apiPathPtrn}-->
+<!--        )-->
+<!--        , #{apiPathPtrn}-->
+<!--        )-->
+<!--    </insert>-->
+
+	<insert id="insertRoleApiAuthMapgByMethodType" parameterType="kr.co.dsi.system.api.dto.ApiRoleMethodMapg">
+		/*
+			SQL ID : co.kr.rp.mgmt.common.vo.insertRoleApiAuthMapgByMethodType
+			SQL 명: 역할-api-권한 매핑 정보 등록 - 메소드 타입 이용
+		*/
+		INSERT
+		  INTO TB_ROLE_API_AUTH_MAPG (
+			 AUTH_ID
+			 , API_ID
+			 , ROLE_ID
+			 , REG_DT
+			 , REG_USER_ID
+			 , UPD_DT
+			 , UPD_USER_ID
+			 )
+	    VALUES (
+			    CASE #{apiActDivsCode} WHEN 'GET' THEN 'ALL_R'
+									   WHEN 'POST' THEN 'ALL_W'
+									   WHEN 'DELETE' THEN 'ALL_D'
+									   WHEN 'PUT' THEN 'ALL_W'
+		    	END
+		    	, #{apiId}
+		    	, #{roleId}
+		    	, CURRENT_TIMESTAMP()
+		    	, #{loginId}
+		    	, CURRENT_TIMESTAMP()
+		    	, #{loginId}
+		)
+	</insert>
+
+	<delete id="deleteRoleApiAuthMapgInfo" parameterType="java.lang.String">
+		DELETE
+		  FROM TB_ROLE_API_AUTH_MAPG
+		 WHERE API_ID LIKE CONCAT('%',#{apiId},'%')
+	</delete>
+
+</mapper>
