@@ -1,7 +1,7 @@
-package kr.co.dsi.common.exception;
+package com.stock.sp.apiserver.common.exception;
 
-import kr.co.dsi.common.dto.web.ComResultDto;
-import kr.co.dsi.common.utils.StringUtils;
+import com.stock.sp.apiserver.common.dto.web.ComResultDto;
+import com.stock.sp.apiserver.common.utils.StringUtils;
 import org.springframework.beans.factory.config.YamlMapFactoryBean;
 import org.springframework.core.io.ClassPathResource;
 
@@ -17,7 +17,7 @@ import java.util.Map;
  * @CreateDate : 2020.06.10
  * @Version : 1.0
  * @Description :
- * ===========================================
+ *              ===========================================
  */
 public class ExceptionInfoConfig {
 	private Map<String, Object> exceptionInfo = null;

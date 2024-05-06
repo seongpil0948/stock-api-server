@@ -1,6 +1,6 @@
-package kr.co.dsi.system.user.dto.res;
+package com.stock.sp.apiserver.system.user.dto.res;
 
-import kr.co.dsi.common.dto.web.ComPagingResponseDto;
+import com.stock.sp.apiserver.common.dto.web.ComPagingResponseDto;
 import lombok.Getter;
 import lombok.Setter;
 

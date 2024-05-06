@@ -1,4 +1,4 @@
-package kr.co.dsi.system.user.dto.res;
+package com.stock.sp.apiserver.system.user.dto.res;
 
 import lombok.Data;
 

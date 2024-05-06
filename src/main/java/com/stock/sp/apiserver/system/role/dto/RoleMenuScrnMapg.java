@@ -1,4 +1,4 @@
-package kr.co.dsi.system.role.dto;
+package com.stock.sp.apiserver.system.role.dto;
 
 /**
  * 역할 메뉴 화면 매핑

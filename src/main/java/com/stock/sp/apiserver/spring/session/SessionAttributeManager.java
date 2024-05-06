@@ -1,6 +1,6 @@
-package kr.co.dsi.spring.session;
+package com.stock.sp.apiserver.spring.session;
 
-import kr.co.dsi.common.login.dto.res.LoginUserDto;
+import com.stock.sp.apiserver.common.login.dto.res.LoginUserDto;
 import org.springframework.security.core.context.SecurityContextHolder;
 
 /**
@@ -12,7 +12,6 @@ import org.springframework.security.core.context.SecurityContextHolder;
  */
 public class SessionAttributeManager {
 	private final static String STR_SEPARATOR = ";";
-
 
 	/**
 	 * 로그인 사용자 정보
@@ -54,6 +53,5 @@ public class SessionAttributeManager {
 	public static String getLoginUserId() {
 		return getLoginUserInfo().getUserId();
 	}
-
 
 }

@@ -1,4 +1,4 @@
-package kr.co.dsi.common.exception;
+package com.stock.sp.apiserver.common.exception;
 
 import java.util.List;
 

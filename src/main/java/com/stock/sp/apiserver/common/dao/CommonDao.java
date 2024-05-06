@@ -1,4 +1,4 @@
-package kr.co.dsi.common.dao;
+package com.stock.sp.apiserver.common.dao;
 
 import org.mybatis.spring.SqlSessionTemplate;
 import org.springframework.beans.factory.annotation.Autowired;

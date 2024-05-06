@@ -1,10 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
-<mapper namespace="kr.co.dsi.common.login">
+<mapper namespace="com.stock.sp.apiserver.common.login">
 
 	<select id="selectUserEncPswd" parameterType="java.lang.String" resultType="java.lang.String">
         /*
-        SQL ID : kr.co.dsi.system.login.dao.LginDao.selectUserEncPswd
+        SQL ID : com.stock.sp.apiserver.system.login.dao.LginDao.selectUserEncPswd
         SQL 명: 사용자 패스워드 조회
         */
         SELECT
@@ -15,9 +15,9 @@
         AND TU.STAT_CD = 'ACTIVE'
     </select>
 
-	<select id="selectUser" parameterType="java.lang.String" resultType="kr.co.dsi.common.login.dto.res.LoginUserDto">
+	<select id="selectUser" parameterType="java.lang.String" resultType="com.stock.sp.apiserver.common.login.dto.res.LoginUserDto">
         /*
-        SQL ID : kr.co.dsi.system.login.dao.LginDao.selectUser
+        SQL ID : com.stock.sp.apiserver.system.login.dao.LginDao.selectUser
         SQL 명: 로그인할 사용자 조회
         */
         SELECT TU.USER_ID AS USER_ID
@@ -51,9 +51,9 @@
         AND TU.STAT_CD = 'ACTIVE'
     </select>
 
-    <select id="selectLoginUserRole" parameterType="kr.co.dsi.common.login.dto.req.LoginReqDto" resultType="kr.co.dsi.common.login.dto.res.LoginUserRoleDto">
+    <select id="selectLoginUserRole" parameterType="com.stock.sp.apiserver.common.login.dto.req.LoginReqDto" resultType="com.stock.sp.apiserver.common.login.dto.res.LoginUserRoleDto">
         /*
-        SQL ID : kr.co.dsi.system.login.selectLoginUserRole
+        SQL ID : com.stock.sp.apiserver.system.login.selectLoginUserRole
         SQL 명: 특정 사용자에게 할당된 역할 목록 조회
         */
         SELECT
@@ -68,7 +68,7 @@
         WHERE A.USER_ID = #{userId}
     </select>
 
-    <select id="selectLoginUserMenuList" parameterType="kr.co.dsi.common.login.dto.req.LoginReqDto" resultType="kr.co.dsi.common.login.dto.res.LoginUserMenuDto">
+    <select id="selectLoginUserMenuList" parameterType="com.stock.sp.apiserver.common.login.dto.req.LoginReqDto" resultType="com.stock.sp.apiserver.common.login.dto.res.LoginUserMenuDto">
         WITH RECURSIVE CTE AS (
             SELECT TM.MENU_ID
                 , TM.MENU_NM

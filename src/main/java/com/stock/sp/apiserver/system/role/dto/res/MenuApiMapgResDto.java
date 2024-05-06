@@ -1,4 +1,4 @@
-package kr.co.dsi.system.role.dto.res;
+package com.stock.sp.apiserver.system.role.dto.res;
 
 public class MenuApiMapgResDto {
 	private String menuId;

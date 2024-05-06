@@ -1,16 +1,16 @@
-package kr.co.dsi.system.role.dao;
+package com.stock.sp.apiserver.system.role.dao;
 
-import kr.co.dsi.system.role.dto.RoleApiAuthMapg;
-import kr.co.dsi.system.role.dto.RoleMenuScrnMapg;
-import kr.co.dsi.system.role.dto.RoleUsrDto;
-import kr.co.dsi.system.role.dto.req.ApiAuthReqDto;
-import kr.co.dsi.system.role.dto.req.RoleMenuScrnMapgReadReqDto;
-import kr.co.dsi.system.role.dto.req.RoleReadReqDto;
-import kr.co.dsi.system.role.dto.res.ApiAuthResDto;
-import kr.co.dsi.system.role.dto.res.MenuApiMapgResDto;
-import kr.co.dsi.system.role.dto.res.RoleMenuScrnMapgReadResDto;
-import kr.co.dsi.system.role.dto.res.RoleReadResDto;
-import kr.co.dsi.system.role.entity.*;
+import com.stock.sp.apiserver.system.role.dto.RoleApiAuthMapg;
+import com.stock.sp.apiserver.system.role.dto.RoleMenuScrnMapg;
+import com.stock.sp.apiserver.system.role.dto.RoleUsrDto;
+import com.stock.sp.apiserver.system.role.dto.req.ApiAuthReqDto;
+import com.stock.sp.apiserver.system.role.dto.req.RoleMenuScrnMapgReadReqDto;
+import com.stock.sp.apiserver.system.role.dto.req.RoleReadReqDto;
+import com.stock.sp.apiserver.system.role.dto.res.ApiAuthResDto;
+import com.stock.sp.apiserver.system.role.dto.res.MenuApiMapgResDto;
+import com.stock.sp.apiserver.system.role.dto.res.RoleMenuScrnMapgReadResDto;
+import com.stock.sp.apiserver.system.role.dto.res.RoleReadResDto;
+import com.stock.sp.apiserver.system.role.entity.*;
 import org.apache.ibatis.annotations.Mapper;
 import org.springframework.stereotype.Repository;
 
@@ -256,7 +256,6 @@ public interface RoleDao {
 	 * @description : 역할-사용자 매핑 정보 멀티건 등록
 	 */
 	Integer insertRoleUsrMapgList(List<RoleUsrMapgEntity> roleUsrMapgEntity);
-
 
 	/**
 	 *

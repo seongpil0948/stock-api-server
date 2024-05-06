@@ -1,6 +1,6 @@
-package kr.co.dsi.spring;
+package com.stock.sp.apiserver.spring;
 
-import kr.co.dsi.common.dto.web.ComResponseDto;
+import com.stock.sp.apiserver.common.dto.web.ComResponseDto;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 

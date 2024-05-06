@@ -1,6 +1,6 @@
-package kr.co.dsi.common.utils;
+package com.stock.sp.apiserver.common.utils;
 
-import javax.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletRequest;
 
 /**
  * @author : 이성진

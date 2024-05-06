@@ -1,17 +1,17 @@
-package kr.co.dsi.system.role.service;
+package com.stock.sp.apiserver.system.role.service;
 
-import kr.co.dsi.common.exception.BizException;
-import kr.co.dsi.common.login.dto.res.LginUsrMenuDto;
-import kr.co.dsi.spring.session.SessionAttributeManager;
-import kr.co.dsi.system.role.dao.RoleDao;
-import kr.co.dsi.system.role.dto.RoleMenuScrnMapg;
-import kr.co.dsi.system.role.dto.RoleUsrDto;
-import kr.co.dsi.system.role.dto.req.*;
-import kr.co.dsi.system.role.dto.res.ApiAuthResDto;
-import kr.co.dsi.system.role.dto.res.MenuApiMapgResDto;
-import kr.co.dsi.system.role.dto.res.RoleMenuScrnMapgReadResDto;
-import kr.co.dsi.system.role.dto.res.RoleReadResDto;
-import kr.co.dsi.system.role.entity.*;
+import com.stock.sp.apiserver.common.exception.BizException;
+import com.stock.sp.apiserver.common.login.dto.res.LginUsrMenuDto;
+import com.stock.sp.apiserver.spring.session.SessionAttributeManager;
+import com.stock.sp.apiserver.system.role.dao.RoleDao;
+import com.stock.sp.apiserver.system.role.dto.RoleMenuScrnMapg;
+import com.stock.sp.apiserver.system.role.dto.RoleUsrDto;
+import com.stock.sp.apiserver.system.role.dto.req.*;
+import com.stock.sp.apiserver.system.role.dto.res.ApiAuthResDto;
+import com.stock.sp.apiserver.system.role.dto.res.MenuApiMapgResDto;
+import com.stock.sp.apiserver.system.role.dto.res.RoleMenuScrnMapgReadResDto;
+import com.stock.sp.apiserver.system.role.dto.res.RoleReadResDto;
+import com.stock.sp.apiserver.system.role.entity.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
@@ -31,8 +31,8 @@ public class RoleService {
 	@Autowired
 	RoleDao roleDao;
 
-//	@Autowired
-//	ApiDao apiDao;
+	// @Autowired
+	// ApiDao apiDao;
 
 	@Value("${spring.application.name}")
 	private String appName;
@@ -88,29 +88,29 @@ public class RoleService {
 					lginUsrMenuDto.setMenuUrl(roleMenuScrnMapg.getMenuUrl());
 
 					// 역할-메뉴-화면 으로 정확하게 할당된 화면만
-//					if (roleMenuScrnMapg.getScrnNm() != null) {
-//						LginUsrScrnDto lginRoleScrn = new LginUsrScrnDto();
-//						lginRoleScrn.setScreenId(roleMenuScrnMapg.getScrnId());
-//						lginRoleScrn.setMainScreenYn(roleMenuScrnMapg.getMainScrnYn());
-//						lginRoleScrn.setScreenName(roleMenuScrnMapg.getScrnNm());
-//						lginRoleScrn.setScreenPath(roleMenuScrnMapg.getScrnPath());
-//
-//						lginUsrMenuDto.getScreenList().add(lginRoleScrn);
-//					}
+					// if (roleMenuScrnMapg.getScrnNm() != null) {
+					// LginUsrScrnDto lginRoleScrn = new LginUsrScrnDto();
+					// lginRoleScrn.setScreenId(roleMenuScrnMapg.getScrnId());
+					// lginRoleScrn.setMainScreenYn(roleMenuScrnMapg.getMainScrnYn());
+					// lginRoleScrn.setScreenName(roleMenuScrnMapg.getScrnNm());
+					// lginRoleScrn.setScreenPath(roleMenuScrnMapg.getScrnPath());
+					//
+					// lginUsrMenuDto.getScreenList().add(lginRoleScrn);
+					// }
 
 					menuMap.put(roleMenuScrnMapg.getMenuId(), lginUsrMenuDto);
-//				} else {
-//					LginUsrMenuDto lginUsrMenuDto = menuMap.get(roleMenuScrnMapg.getMenuId());
+					// } else {
+					// LginUsrMenuDto lginUsrMenuDto = menuMap.get(roleMenuScrnMapg.getMenuId());
 
 					// 역할-메뉴-화면 으로 정확하게 할당된 화면만
-//					if (roleMenuScrnMapg.getScrnNm() != null) {
-//						LginUsrScrnDto lginRoleScrn = new LginUsrScrnDto();
-//						lginRoleScrn.setScreenId(roleMenuScrnMapg.getScrnId());
-//						lginRoleScrn.setMainScreenYn(roleMenuScrnMapg.getMainScrnYn());
-//						lginRoleScrn.setScreenName(roleMenuScrnMapg.getScrnNm());
-//						lginRoleScrn.setScreenPath(roleMenuScrnMapg.getScrnPath());
-//						lginUsrMenuDto.getScreenList().add(lginRoleScrn);
-//					}
+					// if (roleMenuScrnMapg.getScrnNm() != null) {
+					// LginUsrScrnDto lginRoleScrn = new LginUsrScrnDto();
+					// lginRoleScrn.setScreenId(roleMenuScrnMapg.getScrnId());
+					// lginRoleScrn.setMainScreenYn(roleMenuScrnMapg.getMainScrnYn());
+					// lginRoleScrn.setScreenName(roleMenuScrnMapg.getScrnNm());
+					// lginRoleScrn.setScreenPath(roleMenuScrnMapg.getScrnPath());
+					// lginUsrMenuDto.getScreenList().add(lginRoleScrn);
+					// }
 				}
 			}
 
@@ -331,15 +331,17 @@ public class RoleService {
 
 		RoleMenuScrnMapgEntity roleMenuScrnMapgEntity = new RoleMenuScrnMapgEntity();
 		roleMenuScrnMapgEntity.setRoleId(roleId);
-		List<RoleMenuScrnMapgEntity> orinList = roleDao.getRoleMenuScrnMapgBySelective(roleMenuScrnMapgEntity); // 현재 메뉴 목록 조회
+		List<RoleMenuScrnMapgEntity> orinList = roleDao.getRoleMenuScrnMapgBySelective(roleMenuScrnMapgEntity); // 현재 메뉴 목록
+																																																						// 조회
 
 		// 요청목록 변환 -> Entity
-		if (roleMenuScrnMapgCreateReqDto.getMenuScrnMapg() != null && roleMenuScrnMapgCreateReqDto.getMenuScrnMapg().size() > 0) {
+		if (roleMenuScrnMapgCreateReqDto.getMenuScrnMapg() != null
+				&& roleMenuScrnMapgCreateReqDto.getMenuScrnMapg().size() > 0) {
 			for (MenuScrnMapgUpdateReqDto menuScrnMapgUpdateReqDto : roleMenuScrnMapgCreateReqDto.getMenuScrnMapg()) {
 				RoleMenuScrnMapgEntity roleUsrMapgEntity = new RoleMenuScrnMapgEntity();
 				roleUsrMapgEntity.setRoleId(roleId);
 				roleUsrMapgEntity.setMenuId(menuScrnMapgUpdateReqDto.getMenuId());
-//				roleUsrMapgEntity.setScrnId(menuScrnMapgUpdateReqDto.getScreenId());
+				// roleUsrMapgEntity.setScrnId(menuScrnMapgUpdateReqDto.getScreenId());
 				roleUsrMapgEntity.setMainScrnYn(menuScrnMapgUpdateReqDto.getMainScreenYn());
 				roleUsrMapgEntity.setLoginId(loginId);
 				reqList.add(roleUsrMapgEntity);
@@ -356,7 +358,7 @@ public class RoleService {
 						RoleApiAuthMapgEntity apiAuthMapgEntity = new RoleApiAuthMapgEntity();
 						ApiAuthReqDto apiAuthReqDto = new ApiAuthReqDto();
 						apiAuthReqDto.setApiId(apiMapgItem.getApiId());
-//						apiAuthReqDto.setRoleType(roleMenuScrnMapgCreateReqDto.getRoleType());
+						// apiAuthReqDto.setRoleType(roleMenuScrnMapgCreateReqDto.getRoleType());
 						ApiAuthResDto apiAuthResDto = roleDao.selectApiAuth(apiAuthReqDto);
 						apiAuthMapgEntity.setAuthId(apiAuthResDto.getAuthId());
 						apiAuthMapgEntity.setApiId(apiAuthResDto.getApiId());
@@ -375,8 +377,8 @@ public class RoleService {
 				for (MenuApiMapgResDto commonMenuApiMapgItem : commonMenuApiMapgResList) {
 					RoleApiAuthMapgEntity commonApiAuthMapgEntity = new RoleApiAuthMapgEntity();
 					ApiAuthReqDto commonApiAuthReqDto = new ApiAuthReqDto();
-//					commonApiAuthReqDto.setApiId(commonMenuApiMapgItem.getApiId());
-//					commonApiAuthReqDto.setRoleType(roleMenuScrnMapgCreateReqDto.getRoleType());
+					// commonApiAuthReqDto.setApiId(commonMenuApiMapgItem.getApiId());
+					// commonApiAuthReqDto.setRoleType(roleMenuScrnMapgCreateReqDto.getRoleType());
 					ApiAuthResDto commonApiAuthResDto = roleDao.selectApiAuth(commonApiAuthReqDto);
 					commonApiAuthMapgEntity.setAuthId(commonApiAuthResDto.getAuthId());
 					commonApiAuthMapgEntity.setApiId(commonApiAuthResDto.getApiId());
@@ -424,18 +426,19 @@ public class RoleService {
 					break;
 				}
 			}
-			// 요청 정보중에  nochange와 같다는건 업데이트 건이다
+			// 요청 정보중에 nochange와 같다는건 업데이트 건이다
 			if (equal) {
-//				req.setUpdUsrId(crteUsrId);
-//				result += roleDao.updateRoleMenuScrnMapg(req); // 요청 정보로 업데이트
-//				RoleMenuScrnMapgHistEntity roleMenuScrnMapgEntityHist = new RoleMenuScrnMapgHistEntity();
-//				roleMenuScrnMapgEntityHist.setRoleId(req.getRoleId());
-//				roleMenuScrnMapgEntityHist.setMenuId(req.getMenuId());
-//				roleMenuScrnMapgEntityHist.setScrnId(req.getScrnId());
-//				roleMenuScrnMapgEntityHist.setMainScrnYn(req.getMainScrnYn());
-//				roleMenuScrnMapgEntityHist.setCrteUsrId(crteUsrId);
-//				roleMenuScrnMapgEntityHist.setPrssDivs(ComConstant.CUD_U); // 수정
-//				roleUsrMapgHistEntityList.add(roleMenuScrnMapgEntityHist);
+				// req.setUpdUsrId(crteUsrId);
+				// result += roleDao.updateRoleMenuScrnMapg(req); // 요청 정보로 업데이트
+				// RoleMenuScrnMapgHistEntity roleMenuScrnMapgEntityHist = new
+				// RoleMenuScrnMapgHistEntity();
+				// roleMenuScrnMapgEntityHist.setRoleId(req.getRoleId());
+				// roleMenuScrnMapgEntityHist.setMenuId(req.getMenuId());
+				// roleMenuScrnMapgEntityHist.setScrnId(req.getScrnId());
+				// roleMenuScrnMapgEntityHist.setMainScrnYn(req.getMainScrnYn());
+				// roleMenuScrnMapgEntityHist.setCrteUsrId(crteUsrId);
+				// roleMenuScrnMapgEntityHist.setPrssDivs(ComConstant.CUD_U); // 수정
+				// roleUsrMapgHistEntityList.add(roleMenuScrnMapgEntityHist);
 			}
 		}
 
@@ -465,7 +468,6 @@ public class RoleService {
 	 * @author : cwcho
 	 * @param roleId
 	 * @param menuId
-	 * @param scrnId
 	 * @return
 	 * @return : Integer
 	 * @description :
@@ -500,7 +502,8 @@ public class RoleService {
 	 * @return : List<RoleMenuScrnMapgReadResDto>
 	 * @description : 역할-메뉴-화면 매핑 정보를 조회한다.
 	 */
-	public List<RoleMenuScrnMapgReadResDto> selectRoleMenuScrnMapg(RoleMenuScrnMapgReadReqDto roleMenuScrnMapgReadReqDto) {
+	public List<RoleMenuScrnMapgReadResDto> selectRoleMenuScrnMapg(
+			RoleMenuScrnMapgReadReqDto roleMenuScrnMapgReadReqDto) {
 		return roleDao.selectRoleMenuScrnMapg(roleMenuScrnMapgReadReqDto);
 	}
 
@@ -578,34 +581,38 @@ public class RoleService {
 		return result;
 	}
 
-//	@Transactional(readOnly = true)
-//	@CachePut(value = "roleApiAuthMapgForSpringSecurity", key = "#applicationName")
-//	public HashMap<ApiAuthPattern, HashSet<String>> getRoleApiAuthMapgForReload(String applicationName) {
-//		List<RoleApiAuthMapg> roleApiAuthMapgList = roleDao.getRoleApiAuthMapgForSpringSecurity(applicationName);
-//
-//		// AUTH_ID+API_PATTERN 기준으로 역할목록을 정리한다.
-//		HashMap<ApiAuthPattern, HashSet<String>> arrangeApi = new HashMap<ApiAuthPattern, HashSet<String>>();
-//		for (RoleApiAuthMapg roleApiAuthMapg : roleApiAuthMapgList) {
-//			ApiAuthPattern api = new ApiAuthPattern();
-//			if (roleApiAuthMapg.getAuthId().endsWith(ComConstantAuth.RWD_R)) {
-//				api.setAuthRwd(ComConstantAuth.RWD_R);
-//			} else if (roleApiAuthMapg.getAuthId().endsWith(ComConstantAuth.RWD_W)) {
-//				api.setAuthRwd(ComConstantAuth.RWD_W);
-//			} else if (roleApiAuthMapg.getAuthId().endsWith(ComConstantAuth.RWD_D)) {
-//				api.setAuthRwd(ComConstantAuth.RWD_D);
-//			}
-//			api.setApiPathPtrn(roleApiAuthMapg.getApiPathPtrn());
-//
-//			if (arrangeApi.get(api) != null) {
-//				arrangeApi.get(api).add(roleApiAuthMapg.getRoleId());
-//			} else {
-//				HashSet<String> roleSets = new HashSet<String>();
-//				roleSets.add(roleApiAuthMapg.getRoleId());
-//				arrangeApi.put(api, roleSets);
-//			}
-//		}
-//
-//		return arrangeApi;
-//	}
+	// @Transactional(readOnly = true)
+	// @CachePut(value = "roleApiAuthMapgForSpringSecurity", key =
+	// "#applicationName")
+	// public HashMap<ApiAuthPattern, HashSet<String>>
+	// getRoleApiAuthMapgForReload(String applicationName) {
+	// List<RoleApiAuthMapg> roleApiAuthMapgList =
+	// roleDao.getRoleApiAuthMapgForSpringSecurity(applicationName);
+	//
+	// // AUTH_ID+API_PATTERN 기준으로 역할목록을 정리한다.
+	// HashMap<ApiAuthPattern, HashSet<String>> arrangeApi = new
+	// HashMap<ApiAuthPattern, HashSet<String>>();
+	// for (RoleApiAuthMapg roleApiAuthMapg : roleApiAuthMapgList) {
+	// ApiAuthPattern api = new ApiAuthPattern();
+	// if (roleApiAuthMapg.getAuthId().endsWith(ComConstantAuth.RWD_R)) {
+	// api.setAuthRwd(ComConstantAuth.RWD_R);
+	// } else if (roleApiAuthMapg.getAuthId().endsWith(ComConstantAuth.RWD_W)) {
+	// api.setAuthRwd(ComConstantAuth.RWD_W);
+	// } else if (roleApiAuthMapg.getAuthId().endsWith(ComConstantAuth.RWD_D)) {
+	// api.setAuthRwd(ComConstantAuth.RWD_D);
+	// }
+	// api.setApiPathPtrn(roleApiAuthMapg.getApiPathPtrn());
+	//
+	// if (arrangeApi.get(api) != null) {
+	// arrangeApi.get(api).add(roleApiAuthMapg.getRoleId());
+	// } else {
+	// HashSet<String> roleSets = new HashSet<String>();
+	// roleSets.add(roleApiAuthMapg.getRoleId());
+	// arrangeApi.put(api, roleSets);
+	// }
+	// }
+	//
+	// return arrangeApi;
+	// }
 
 }

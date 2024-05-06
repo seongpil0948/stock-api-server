@@ -1,4 +1,4 @@
-package kr.co.dsi.common.utils;
+package com.stock.sp.apiserver.common.utils;
 
 import net.minidev.json.parser.ParseException;
 import org.apache.commons.codec.binary.Base64;

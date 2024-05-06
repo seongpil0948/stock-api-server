@@ -1,11 +1,12 @@
-package kr.co.dsi.system.role.dto.req;
+package com.stock.sp.apiserver.system.role.dto.req;
 
 import java.util.List;
 
-import javax.validation.constraints.NotEmpty;
-import javax.validation.constraints.Size;
+import jakarta.validation.constraints.NotEmpty;
+import jakarta.validation.constraints.Size;
 
 import io.swagger.v3.oas.annotations.media.Schema;
+import lombok.Getter;
 
 /**
  * 
@@ -13,6 +14,7 @@ import io.swagger.v3.oas.annotations.media.Schema;
  * @author : cwcho
  * @description : 역할 수정 요청 Dto
  */
+@Getter
 @Schema(description = "역할 수정 요청")
 public class RoleUpdateReqDto {
 
@@ -43,32 +45,16 @@ public class RoleUpdateReqDto {
 	@Schema(description = "역할-메뉴-화면 매핑 정보 생성")
 	private List<MenuScrnMapgUpdateReqDto> menuScrnMapg;
 
-	public String getRoleName() {
-		return roleName;
-	}
-
 	public void setRoleName(String roleName) {
 		this.roleName = roleName;
-	}
-
-	public String getRoleDescription() {
-		return roleDescription;
 	}
 
 	public void setRoleDescription(String roleDescription) {
 		this.roleDescription = roleDescription;
 	}
 
-	public String getUseYn() {
-		return useYn;
-	}
-
 	public void setUseYn(String useYn) {
 		this.useYn = useYn;
-	}
-
-	public List<MenuScrnMapgUpdateReqDto> getMenuScrnMapg() {
-		return menuScrnMapg;
 	}
 
 	public void setMenuScrnMapg(List<MenuScrnMapgUpdateReqDto> menuScrnMapg) {

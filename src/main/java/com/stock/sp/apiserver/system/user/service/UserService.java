@@ -1,14 +1,14 @@
-package kr.co.dsi.system.user.service;
+package com.stock.sp.apiserver.system.user.service;
 
-import kr.co.dsi.common.dao.CommonDao;
-import kr.co.dsi.common.exception.BizException;
-import kr.co.dsi.common.utils.StringUtils;
-import kr.co.dsi.spring.session.SessionAttributeManager;
-import kr.co.dsi.system.user.dto.RoleUserMapgDto;
-import kr.co.dsi.system.user.dto.req.*;
-import kr.co.dsi.system.user.dto.res.RoleUserReadListResDto;
-import kr.co.dsi.system.user.dto.res.UserReadListResDto;
-import kr.co.dsi.system.user.dto.res.UserReadResDto;
+import com.stock.sp.apiserver.common.dao.CommonDao;
+import com.stock.sp.apiserver.common.exception.BizException;
+import com.stock.sp.apiserver.common.utils.StringUtils;
+import com.stock.sp.apiserver.spring.session.SessionAttributeManager;
+import com.stock.sp.apiserver.system.user.dto.RoleUserMapgDto;
+import com.stock.sp.apiserver.system.user.dto.req.*;
+import com.stock.sp.apiserver.system.user.dto.res.RoleUserReadListResDto;
+import com.stock.sp.apiserver.system.user.dto.res.UserReadListResDto;
+import com.stock.sp.apiserver.system.user.dto.res.UserReadResDto;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -28,9 +28,9 @@ import java.util.regex.Pattern;
 @Slf4j
 @Service
 public class UserService {
-	private final String USER_NAME_SPACE = "kr.co.dsi.system.user.";
-	private final String ROLE_NAME_SPACE = "kr.co.dsi.system.role.dao.RoleDao.";
-	private final String CODE_NAME_SPACE = "kr.co.dsi.system.cd.dao.CdDao.";
+	private final String USER_NAME_SPACE = "com.stock.sp.apiserver.system.user.";
+	private final String ROLE_NAME_SPACE = "com.stock.sp.apiserver.system.role.dao.RoleDao.";
+	private final String CODE_NAME_SPACE = "com.stock.sp.apiserver.system.cd.dao.CdDao.";
 
 	@Autowired
 	CommonDao commonDao;
@@ -65,6 +65,7 @@ public class UserService {
 
 		return result;
 	}
+
 	/**
 	 * 
 	 * @methodName : selectUsrOne
@@ -104,7 +105,7 @@ public class UserService {
 		String userPswd = userCreateReqDto.getPswd();
 
 		String encryptPswd = null;
-		if(!StringUtils.isEmpty(userPswd)) {
+		if (!StringUtils.isEmpty(userPswd)) {
 			if (!Pattern.matches(passwordPattern, userPswd)) {
 				throw new BizException("invalid-password-pattern");
 			}
@@ -137,7 +138,7 @@ public class UserService {
 
 		Integer result = commonDao.update(USER_NAME_SPACE.concat("updateUser"), userUpdateReqDto);
 
-		//역할 수정이 단건으로만 처리된다면 해당 Dto 삭제 후 Mapper의 parameter 수정
+		// 역할 수정이 단건으로만 처리된다면 해당 Dto 삭제 후 Mapper의 parameter 수정
 		if (null != userUpdateReqDto.getRoleId()) {
 			RoleUserMapgDto roleUserMapgDto = new RoleUserMapgDto();
 			roleUserMapgDto.setUserId(userUpdateReqDto.getUserId());
@@ -162,11 +163,11 @@ public class UserService {
 	@Transactional
 	public Integer updateUserPswd(UserUpdatePswdReqDto userUpdatePwdReqDto) {
 
-		String userPswd= userUpdatePwdReqDto.getPswd();
+		String userPswd = userUpdatePwdReqDto.getPswd();
 		String userPswdConfirm = userUpdatePwdReqDto.getPswdConfirm();
 		String encryptPswd = null;
-		if(!StringUtils.isEmpty(userPswd)) {
-			if(!userPswd.equals(userPswdConfirm)){
+		if (!StringUtils.isEmpty(userPswd)) {
+			if (!userPswd.equals(userPswdConfirm)) {
 				throw new BizException("pw_not_equivalent");
 			}
 			if (!Pattern.matches(passwordPattern, userPswd)) {
@@ -194,7 +195,7 @@ public class UserService {
 	public void deleteUser(String userId) {
 
 		String checkId = commonDao.select(USER_NAME_SPACE.concat("checkDuplicateUser"), userId);
-		if(StringUtils.isEmpty(checkId)){
+		if (StringUtils.isEmpty(checkId)) {
 			throw new BizException("user_empty");
 		}
 		commonDao.delete(ROLE_NAME_SPACE.concat("deleteAllRoleAssigned"), userId);
@@ -218,16 +219,16 @@ public class UserService {
 
 		result.setData(commonDao.selectList(USER_NAME_SPACE.concat("selectRoleUserList"), roleUserSearchReqDto));
 
-		Integer totalCount =
-				commonDao.select(USER_NAME_SPACE.concat("selectRoleUserTotalCount"), roleUserSearchReqDto);
+		Integer totalCount = commonDao.select(USER_NAME_SPACE.concat("selectRoleUserTotalCount"), roleUserSearchReqDto);
 
 		result.setTotalCount(totalCount);
-		result.setTotalPage(totalCount/roleUserSearchReqDto.getLimit());
+		result.setTotalPage(totalCount / roleUserSearchReqDto.getLimit());
 		result.setCurrentPage(roleUserSearchReqDto.getCurrentPage());
 		result.setLimit(roleUserSearchReqDto.getLimit());
 
 		return result;
 	}
+
 	/**
 	 *
 	 * @methodName : updateRoleUser
@@ -240,7 +241,7 @@ public class UserService {
 	@Transactional
 	public void updateRoleUser(List<RoleUserMapgDto> data) {
 
-		for (RoleUserMapgDto role : data){
+		for (RoleUserMapgDto role : data) {
 			role.setUpdUserId(SessionAttributeManager.getLoginUserId());
 			commonDao.update(USER_NAME_SPACE.concat("updateRoleUser"), role);
 		}

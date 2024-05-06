@@ -30,10 +30,10 @@ public class SwaggerConfig {
 	@Bean
 	public OpenAPI api() {
 		List<Server> servers = getSpringDocServers();
-		return new OpenAPI().info(new Info().title("IDP Service")
-				.description("LGUplus IDP Project")
+		return new OpenAPI().info(new Info().title("Stock Service")
+				.description("Stock Project")
 				.version("v1.0")
-				.license(new License().name("Apache 2.0").url("http://abacus.co.kr")))
+				.license(new License().name("Apache 2.0").url("https://stock.peachhub.love")))
 				.servers(servers);
 	}
 }

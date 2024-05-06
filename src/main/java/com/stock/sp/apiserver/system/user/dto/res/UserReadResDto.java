@@ -1,4 +1,4 @@
-package kr.co.dsi.system.user.dto.res;
+package com.stock.sp.apiserver.system.user.dto.res;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonInclude;
@@ -7,8 +7,8 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Getter;
 import lombok.Setter;
 
-import javax.validation.constraints.NotEmpty;
-import javax.validation.constraints.Size;
+import jakarta.validation.constraints.NotEmpty;
+import jakarta.validation.constraints.Size;
 import java.util.List;
 
 /**
@@ -80,8 +80,9 @@ public class UserReadResDto {
 	@Schema(description = "역할 명", example = "일반 사용자")
 	private String roleName;
 
-//	@Schema(description = "사용 여부", example = "Y", required = true, minLength = 1, maxLength = 1)
-//	private String useYn;
+	// @Schema(description = "사용 여부", example = "Y", required = true, minLength = 1,
+	// maxLength = 1)
+	// private String useYn;
 
 	@Schema(description = "등록자 ID", example = "admin", required = true, minLength = 1, maxLength = 100)
 	private String createUserId;

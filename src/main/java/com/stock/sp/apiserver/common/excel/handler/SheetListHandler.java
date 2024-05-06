@@ -1,6 +1,6 @@
-package kr.co.dsi.common.excel.handler;
+package com.stock.sp.apiserver.common.excel.handler;
 
-import kr.co.dsi.common.utils.StringUtils;
+import com.stock.sp.apiserver.common.utils.StringUtils;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.poi.ss.util.CellReference;
 import org.apache.poi.xssf.eventusermodel.XSSFSheetXMLHandler;
@@ -50,7 +50,7 @@ public class SheetListHandler implements XSSFSheetXMLHandler.SheetContentsHandle
 
     public void cell(String columnName, String value, XSSFComment var3) {
         int iCol = (new CellReference(columnName)).getCol();
-        int emptyCol = iCol - currentCol-1;
+        int emptyCol = iCol - currentCol - 1;
         for (int i = 0; i < emptyCol; i++) {
             row.add("");
         }

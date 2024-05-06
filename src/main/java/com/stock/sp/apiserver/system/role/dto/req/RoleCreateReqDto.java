@@ -1,11 +1,11 @@
-package kr.co.dsi.system.role.dto.req;
+package com.stock.sp.apiserver.system.role.dto.req;
 
 import java.util.List;
 
-import javax.validation.constraints.NotEmpty;
-import javax.validation.constraints.Size;
+import jakarta.validation.constraints.NotEmpty;
+import jakarta.validation.constraints.Size;
 
-import kr.co.dsi.system.role.dto.res.MenuApiMapgResDto;
+import com.stock.sp.apiserver.system.role.dto.res.MenuApiMapgResDto;
 import io.swagger.v3.oas.annotations.media.Schema;
 
 /**
@@ -43,10 +43,11 @@ public class RoleCreateReqDto {
 	/**
 	 * 역할 타입 구분
 	 */
-//	@Schema(description = "역할 타입 구분(MGMT, UMVCS)", example = "MGMT", required = true, minLength = 1, maxLength = 50)
-//	@NotEmpty
-//	@Size(min = 1, max = 50)
-//	private String roleType;
+	// @Schema(description = "역할 타입 구분(MGMT, UMVCS)", example = "MGMT", required =
+	// true, minLength = 1, maxLength = 50)
+	// @NotEmpty
+	// @Size(min = 1, max = 50)
+	// private String roleType;
 
 	/**
 	 * 사용 여부
@@ -82,13 +83,13 @@ public class RoleCreateReqDto {
 		this.roleDescription = roleDescription;
 	}
 
-//	public String getRoleType() {
-//		return roleType;
-//	}
-//
-//	public void setRoleType(String roleType) {
-//		this.roleType = roleType;
-//	}
+	// public String getRoleType() {
+	// return roleType;
+	// }
+	//
+	// public void setRoleType(String roleType) {
+	// this.roleType = roleType;
+	// }
 
 	public String getUseYn() {
 		return useYn;

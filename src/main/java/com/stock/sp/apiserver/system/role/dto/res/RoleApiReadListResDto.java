@@ -1,6 +1,6 @@
-package kr.co.dsi.system.role.dto.res;
+package com.stock.sp.apiserver.system.role.dto.res;
 
-import kr.co.dsi.common.dto.web.ComPagingResponseDto;
+import com.stock.sp.apiserver.common.dto.web.ComPagingResponseDto;
 import io.swagger.v3.oas.annotations.media.Schema;
 
 import java.util.List;

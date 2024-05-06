@@ -1,7 +1,7 @@
-package kr.co.dsi.system.role.dto.req;
+package com.stock.sp.apiserver.system.role.dto.req;
 
-import javax.validation.constraints.NotEmpty;
-import javax.validation.constraints.Size;
+import jakarta.validation.constraints.NotEmpty;
+import jakarta.validation.constraints.Size;
 
 import io.swagger.v3.oas.annotations.media.Schema;
 

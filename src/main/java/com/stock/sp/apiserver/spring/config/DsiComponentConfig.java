@@ -1,8 +1,8 @@
-package kr.co.dsi.spring.config;
+package com.stock.sp.apiserver.spring.config;
 
-import kr.co.dsi.common.exception.ExceptionInfoConfig;
-import kr.co.dsi.common.utils.ApplicationContextManager;
-import kr.co.dsi.spring.interceptor.ControllerInterceptor;
+import com.stock.sp.apiserver.common.exception.ExceptionInfoConfig;
+import com.stock.sp.apiserver.common.utils.ApplicationContextManager;
+import com.stock.sp.apiserver.spring.interceptor.ControllerInterceptor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
@@ -10,7 +10,7 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
 @Configuration
-@ComponentScan(basePackages = "kr.co.idp")
+@ComponentScan(basePackages = "com.stock.sp")
 public class DsiComponentConfig {
 	@Bean
 	public ApplicationContextManager getApplicationManager() {

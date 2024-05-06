@@ -1,6 +1,6 @@
-package kr.co.dsi.common.dto.web;
+package com.stock.sp.apiserver.common.dto.web;
 
-import kr.co.dsi.common.constant.ComConstant;
+import com.stock.sp.apiserver.common.constant.ComConstant;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonInclude;
 

@@ -1,11 +1,11 @@
-package kr.co.dsi.spring.exception;
+package com.stock.sp.apiserver.spring.exception;
 
-import kr.co.dsi.common.dto.web.ComResponseDto;
-import kr.co.dsi.common.dto.web.ComResultDto;
-import kr.co.dsi.common.exception.BizException;
-import kr.co.dsi.common.exception.ExceptionInfoConfig;
-import kr.co.dsi.common.utils.StringUtils;
-import kr.co.dsi.spring.ComResponseEntity;
+import com.stock.sp.apiserver.common.dto.web.ComResponseDto;
+import com.stock.sp.apiserver.common.dto.web.ComResultDto;
+import com.stock.sp.apiserver.common.exception.BizException;
+import com.stock.sp.apiserver.common.exception.ExceptionInfoConfig;
+import com.stock.sp.apiserver.common.utils.StringUtils;
+import com.stock.sp.apiserver.spring.ComResponseEntity;
 import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -45,7 +45,8 @@ public class CommonExceptionHandler {
 	 * @description : @Valid 어노테이션 관런 처리
 	 */
 	@ExceptionHandler(MethodArgumentNotValidException.class)
-	public @ResponseBody ComResponseEntity<Void> handleMethodArgumentNotValidException(MethodArgumentNotValidException ex) throws Exception {
+	public @ResponseBody ComResponseEntity<Void> handleMethodArgumentNotValidException(MethodArgumentNotValidException ex)
+			throws Exception {
 		errorLogging(ex);
 		BindingResult bindingResult = ex.getBindingResult();
 

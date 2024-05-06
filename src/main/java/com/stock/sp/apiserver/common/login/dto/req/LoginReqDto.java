@@ -1,4 +1,4 @@
-package kr.co.dsi.common.login.dto.req;
+package com.stock.sp.apiserver.common.login.dto.req;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.Getter;

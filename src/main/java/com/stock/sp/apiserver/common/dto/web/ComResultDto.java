@@ -1,4 +1,4 @@
-package kr.co.dsi.common.dto.web;
+package com.stock.sp.apiserver.common.dto.web;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonInclude;

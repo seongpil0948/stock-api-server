@@ -1,8 +1,8 @@
-package kr.co.dsi.system.role.dto.res;
+package com.stock.sp.apiserver.system.role.dto.res;
 
 import java.util.List;
 
-import kr.co.dsi.common.dto.web.ComPagingResponseDto;
+import com.stock.sp.apiserver.common.dto.web.ComPagingResponseDto;
 import io.swagger.v3.oas.annotations.media.Schema;
 
 @Schema(description = "역할-메뉴-화면 매핑 정보 조회")

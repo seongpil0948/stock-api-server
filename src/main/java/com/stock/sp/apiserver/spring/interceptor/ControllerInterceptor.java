@@ -1,18 +1,16 @@
-package kr.co.dsi.spring.interceptor;
+package com.stock.sp.apiserver.spring.interceptor;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import kr.co.dsi.common.dto.web.ComResponseDto;
-import kr.co.dsi.common.exception.BizException;
-import kr.co.dsi.common.exception.ExceptionInfoConfig;
-import kr.co.dsi.common.utils.StringUtils;
+import com.stock.sp.apiserver.common.dto.web.ComResponseDto;
+import com.stock.sp.apiserver.common.exception.ExceptionInfoConfig;
+import com.stock.sp.apiserver.common.utils.StringUtils;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.web.servlet.HandlerInterceptor;
-import org.springframework.web.servlet.ModelAndView;
 
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 import java.util.Map;
 
 @Slf4j
@@ -24,13 +22,13 @@ public class ControllerInterceptor implements HandlerInterceptor {
 	@Autowired
 	private ExceptionInfoConfig exceptionInfoConfig;
 
-	@Value("${ai.external.key}")
+	@Value("${security.key}")
 	private String AUTH_KEY;
 
-	@Override
+	// @Override
 	public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler) throws Exception {
 		String uri = request.getRequestURI().replace(request.getContextPath(), "");
-		if (StringUtils.uriPatternMatches("/ext/**", uri)) {
+		if (StringUtils.uriPatternMatches("/private/**", uri)) {
 			String authKey = request.getHeader("authKey");
 			log.info("uri {}, authKey {}", uri, authKey);
 
@@ -48,14 +46,6 @@ public class ControllerInterceptor implements HandlerInterceptor {
 		return true;
 	}
 
-	@Override
-	public void postHandle(HttpServletRequest request, HttpServletResponse response, Object handler, ModelAndView modelAndView) throws Exception {
-	}
-
-	@Override
-	public void afterCompletion(HttpServletRequest request, HttpServletResponse response, Object object, Exception arg3) throws Exception {
-	}
-
 	private void accessDeniedCheck(HttpServletRequest request, HttpServletResponse response) throws Exception {
 		ComResponseDto<String> comResponseDto = new ComResponseDto<String>();
 		Map<String, Object> exceptionInfo = exceptionInfoConfig.getExceptionInfo("permission_denied");
@@ -65,11 +55,11 @@ public class ControllerInterceptor implements HandlerInterceptor {
 		comResponseDto.setHttpStatusCode(statusCode);
 		comResponseDto.setCode(code.toString());
 		comResponseDto.setMessage(msg);
-		if (exceptionInfo == null) {
-			comResponseDto.setBody("권한이 없습니다.");
-		} else {
-			comResponseDto.setBody(msg);
-		}
+		// if (exceptionInfo == null) {
+		// comResponseDto.setBody("권한이 없습니다.");
+		// } else {
+		comResponseDto.setBody(msg);
+		// }
 
 		// 응답을 정의(html 또는 json)
 		response.setStatus(statusCode);

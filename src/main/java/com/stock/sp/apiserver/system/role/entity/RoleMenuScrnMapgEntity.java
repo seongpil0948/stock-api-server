@@ -1,4 +1,4 @@
-package kr.co.dsi.system.role.entity;
+package com.stock.sp.apiserver.system.role.entity;
 
 /**
  * 

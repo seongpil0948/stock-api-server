@@ -1,17 +1,17 @@
-package kr.co.dsi.common.login.controller;
+package com.stock.sp.apiserver.common.login.controller;
 
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
-import kr.co.dsi.common.dto.web.ComResponseDto;
-import kr.co.dsi.spring.ComResponseEntity;
+import com.stock.sp.apiserver.common.dto.web.ComResponseDto;
+import com.stock.sp.apiserver.spring.ComResponseEntity;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 
 @CrossOrigin
 @RestController

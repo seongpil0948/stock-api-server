@@ -1,4 +1,4 @@
-package kr.co.dsi.system.role.dto.req;
+package com.stock.sp.apiserver.system.role.dto.req;
 
 public class ApiAuthReqDto {
 	private String apiId;

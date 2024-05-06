@@ -1,0 +1,242 @@
+# code 형식: 998:사용자정의 오류, 997:시스템오류
+# desc 형식: 사용자정의 오류메세지
+success:
+  200ok:
+    code: 20000000
+    desc: "성 공 "
+    status: 200
+exception:
+  com.fasterxml.jackson.core.io.JsonEOFException:
+    code: 30000001
+    desc: "JSON 변환 중 문제가 있습니다."
+    status: 400
+  com.fasterxml.jackson.core.JsonParseException:
+    code: 30000002
+    desc: "JSON 변환 중 문제가 있습니다."
+    status: 400
+  com.fasterxml.jackson.databind.exc.MismatchedInputException:     
+    code: 30000003
+    desc: "JSON 변환 중 문제가 있습니다."
+    status: 400  
+  com.fasterxml.jackson.databind.JsonMappingException:
+    code: 30000004
+    desc: "JSON 변환 중 문제가 있습니다."
+    status: 400
+  com.fasterxml.jackson.databind.exc.InvalidDefinitionException:
+    code: 30000005
+    desc: "JSON 변환 중 문제가 있습니다."
+    status: 400
+  org.springframework.http.converter.HttpMessageConversionException:
+    code: 30000006
+    desc: "JSON 변환 중 문제가 있습니다."
+    status: 400   
+  org.springframework.http.converter.HttpMessageNotReadableException:
+    code: 30000007
+    desc: "JSON 변환 중 문제가 있습니다."
+    status: 400
+  parameter.validation.error:
+    code: 30000008
+    desc: "입력값 오류 입니다."
+    status: 400
+  parameter.validation.IllegalArgumentException:
+    code: 30000009
+    desc: "입력값 오류 입니다."
+    status: 400  
+  org.springframework.web.bind.MethodArgumentNotValidException:
+    code: 30000010
+    desc: "입력값 오류 입니다."
+    status: 400
+  org.springframework.web.servlet.NoHandlerFoundException:
+    code: 30000011
+    desc: "지원하지 않는 URL"
+    status: 404
+  login_id_pw_not_valid:
+    code: "40000000"
+    desc: "아이디 또는 비밀번호가 일치하지 않습니다."
+    status: "401"
+  pw_not_equivalent:
+    code: "40000100"
+    desc: "비밀번호가 일치하지 않습니다."
+    status: "401"
+  login_required:
+    code: 40000001
+    desc: "로그인 후 시도해주세요."
+    status: 401
+  duplicate_login_check:
+    code: "40000001"
+    desc: "이미 로그인 중인 사용자 입니다."
+    status: "401"
+  permission_denied:
+    code: 40000003
+    desc: "권한이 없습니다."
+    status: 403
+  org.springframework.web.HttpRequestMethodNotSupportedException:
+    code: 40000004
+    desc: "잘못된 요청입니다."
+    status: 405
+  file_empty:
+    code: 40000005
+    desc: "파일이 존재하지 않습니다."
+    status: 404
+  user_empty:
+    code: 40000006
+    desc: "사용자가 존재하지 않습니다."
+    status: 404
+  data_set_invalid:
+    code: 40000106
+    desc: "입력한 데이터셋이 존재하지 않습니다."
+    status: 404
+  trng_id_invalid:
+    code: 40000107
+    desc: "입력한 학습 아이디가 존재하지 않습니다."
+    status: 404
+  algorithm_invalid:
+    code: 40400108
+    desc: "입력한 알고리즘이 존재하지 않습니다."
+    status: 404
+  inspt_sno_invalid:
+    code: 40000109
+    desc: "분석 대상이 존재하지 않습니다."
+    status: 404
+  file_oversize:
+    code: 40000007
+    desc: "파일 크기가 {0}를 초과했습니다."
+    status: 500
+  org.springframework.web.multipart.MaxUploadSizeExceededException:
+    code: 40000008
+    desc: "파일 크기가 10MB를 초과했습니다."
+    status: 500
+  file_permission_denied:
+    code: 40000009
+    desc: "지원하지 않는 확장자입니다.\r\n{0}"
+    status: 500
+  data_not_found:
+    code: 40000010
+    desc: "조회결과가 없습니다."
+    status: 400
+  duplicated:
+    code: 40000011
+    desc: "이미 등록된 {0}가 존재합니다."
+    status: 409
+  duplicated_master:
+    code: 40000012
+    desc: "이미 등록된 마스터 ID가 있습니다."
+    status: 409
+  check_foreign_key:
+    code: 40000013
+    desc: "{0}"
+    status: 500
+  cannot_change_use_yn:
+    code: 40000014
+    desc: "사용중인 {0}(은)는 [사용하지 않음]으로 변경할 수 없습니다."
+    status: 500
+  modelling_data_not_found:
+    code: 40000016
+    desc: "생성된 3D 모델링 파일이 없습니다"
+    status: 400
+  cannot_change_data:
+    code: 40000033
+    desc: "설정한 {0}(은)는 변경할 수 없습니다."
+    status: 400
+  cannot_delete:
+    code: 40000015
+    desc: "사용중인 {0}(은)는 삭제 할 수 없습니다."
+    status: 500
+  invalid-phone-pattern:
+    code: 40000026
+    desc: "전화번호는 11자리 초과일 수 없습니다."
+    status: 400
+  invalid-id:
+    code: 40000027
+    desc: "특수문자는 포함 될 수 없습니다."
+    status: 400
+  duplicated_id:
+    code: 40000030
+    desc: "{0} 중복되었습니다."
+    status: 409
+  duplicated_usr:
+    code: 40000031
+    desc: "이미 등록된 사용자 ID가 있습니다."
+    status: 409
+  duplicated_cuco_nm:
+    code: 40000032
+    desc: "이미 등록된 고객사 명이 있습니다."
+    status: 409
+  org.springframework.jdbc:
+    code: 41000001
+    desc: "데이터베이스 오류"
+    status: 500
+  org.apache.ibatis.reflection.ReflectionException:
+    code: 41000002
+    desc: "데이터베이스 오류"
+    status: 500
+  org.springframework.dao.DataAccessException:
+    code: 41000003
+    desc: "데이터베이스 오류"
+    status: 500
+  org.apache.ibatis.javassist.NotFoundException:
+    code: 41000004
+    desc: "데이터베이스 오류"
+    status: 500
+  # DB 중복키 발생 오류  
+  org.springframework.dao.DuplicateKeyException:
+    code: 41000005
+    desc: "데이터베이스 오류(중복키 발생)"
+    status: 500
+  # DB 외래키 참조 제약(참조하는 외래키 때문에 삭제 및 변경 불가)  
+  org.springframework.dao.DataIntegrityViolationException:
+    code: 41000006
+    desc: "데이터베이스 오류(외래키 참조 조건)"
+    status: 500          
+  java.sql.SQLException:
+    code: 41000007
+    desc: "데이터 베이스 SQL 에러."
+    status: 500          
+  org.springframework.jdbc.BadSqlGrammarException:
+    code: 41000007
+    desc: "데이터베이스 오류({0})"
+    status: 500
+  notdefine:
+    code: 40000999
+    desc: "정의되지않은 오류입니다 "
+    status: 500
+  error:
+    code: 40000999
+    desc: "처리에 실패했습니다."
+    status: 500
+  fileUpload.ConvertFail:
+    code: 40000028
+    desc: "첨부파일 업로드 처리중 오류가 발생했습니다."
+    status: 500
+  fileUpload.InvalidAppendndfileKind:
+    code: 40000029
+    desc: "등록되지 않은 첨부파일유형코드입니다."
+    status: 500
+  fileUpload.InvalidData:
+    code: 40000030
+    desc: "유효하지 않은 데이터 입니다."
+    status: 500
+  fileUpload.InvalidExtension:
+    code: 40000031
+    desc: "업로드 하신 파일 형식이 유효하지 않습니다."
+    status: 500
+  fileDownload.Fail:
+    code: 40000032
+    desc: "파일 다운로드에 실패 하였습니다."
+    status: 500
+  fail_add:
+    code: 50000001
+    desc: "등록에 실패했습니다."
+    status: 500  
+  fail_update:
+    code: 50000002
+    desc: "수정에 실패했습니다."
+    status: 500      
+  fail_remove:
+    code: 50000003
+    desc: "삭제에 실패했습니다."
+    status: 500
+  fail_delete:
+    code: 50000003
+    desc: "삭제에 실패했습니다."
+    status: 500

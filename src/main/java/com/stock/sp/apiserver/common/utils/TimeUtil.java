@@ -1,4 +1,4 @@
-package kr.co.dsi.common.utils;
+package com.stock.sp.apiserver.common.utils;
 
 import java.text.SimpleDateFormat;
 import java.util.Date;

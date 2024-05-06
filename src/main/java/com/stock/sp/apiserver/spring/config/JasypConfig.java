@@ -1,4 +1,4 @@
-package kr.co.dsi.spring.config;
+package com.stock.sp.apiserver.spring.config;
 
 import org.jasypt.encryption.StringEncryptor;
 import org.jasypt.encryption.pbe.PooledPBEStringEncryptor;

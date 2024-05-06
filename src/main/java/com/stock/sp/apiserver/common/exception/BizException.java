@@ -1,6 +1,6 @@
-package kr.co.dsi.common.exception;
+package com.stock.sp.apiserver.common.exception;
 
-import kr.co.dsi.common.dto.web.ComResultDto;
+import com.stock.sp.apiserver.common.dto.web.ComResultDto;
 
 import java.util.List;
 

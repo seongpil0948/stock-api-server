@@ -1,4 +1,4 @@
-package kr.co.dsi.common.constant;
+package com.stock.sp.apiserver.common.constant;
 
 /**
  * 

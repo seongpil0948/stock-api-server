@@ -1,24 +1,26 @@
-package kr.co.dsi.system.role.controller;
+package com.stock.sp.apiserver.system.role.controller;
 
+import com.stock.sp.apiserver.common.dto.web.ComResponseDto;
+import com.stock.sp.apiserver.common.exception.BizException;
+import com.stock.sp.apiserver.spring.ComResponseEntity;
+import com.stock.sp.apiserver.system.role.dto.req.*;
+import com.stock.sp.apiserver.system.role.dto.res.RoleMenuScrnMapgReadListResDto;
+import com.stock.sp.apiserver.system.role.dto.res.RoleMenuScrnMapgReadResDto;
+import com.stock.sp.apiserver.system.role.dto.res.RoleReadListResDto;
+import com.stock.sp.apiserver.system.role.dto.res.RoleReadResDto;
+import com.stock.sp.apiserver.system.role.service.RoleService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.Parameters;
 import io.swagger.v3.oas.annotations.tags.Tag;
-import kr.co.dsi.common.dto.web.ComResponseDto;
-import kr.co.dsi.common.exception.BizException;
-import kr.co.dsi.common.exception.ExceptionInfoConfig;
-import kr.co.dsi.spring.ComResponseEntity;
-import kr.co.dsi.system.role.dto.req.*;
-import kr.co.dsi.system.role.dto.res.*;
-import kr.co.dsi.system.role.service.RoleService;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 
-import javax.servlet.http.HttpServletRequest;
-import javax.validation.Valid;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.validation.Valid;
 import java.util.List;
 
 /**
@@ -33,10 +35,6 @@ import java.util.List;
 @RequestMapping("/roles")
 public class RoleController {
 	private final Logger logger = LogManager.getLogger(getClass());
-
-	@Autowired
-	private ExceptionInfoConfig exceptionInfoConfig;
-
 	/**
 	 * 역할 서비스
 	 */
@@ -47,9 +45,7 @@ public class RoleController {
 	 * 
 	 * @methodName : getRoleList
 	 * @author : cwcho
-	 * @param request
 	 * @param searchType
-	 * @param searchText
 	 * @param useYn
 	 * @param currentPage
 	 * @param limit
@@ -60,17 +56,18 @@ public class RoleController {
 	 */
 	@Operation(summary = "역할 목록 조회", description = "역할 목록 조회")
 	@Parameters({
-	   @Parameter(name = "searchType", description = "검색 조건 <br><br>ALL : 전체 <br><br> ROLE_ID : 역할 ID <br><br> ROLE_NM : 역할 명 ", example = "ALL"),
-	   @Parameter(name = "keyword", description = "검색어"),
-	   @Parameter(name = "useYn", description = "사용 여부<br><br>ALL | Y | N", example = "ALL"),
-	   @Parameter(name = "currentPage", description = "현재 페이지(옵션, 빈값일 경우 1 기본세팅)"),
-	   @Parameter(name = "limit", description = "페이지 사이즈(옵션, 빈값일 경우 10 기본세팅)") })
+			@Parameter(name = "searchType", description = "검색 조건 <br><br>ALL : 전체 <br><br> ROLE_ID : 역할 ID <br><br> ROLE_NM : 역할 명 ", example = "ALL"),
+			@Parameter(name = "keyword", description = "검색어"),
+			@Parameter(name = "useYn", description = "사용 여부<br><br>ALL | Y | N", example = "ALL"),
+			@Parameter(name = "currentPage", description = "현재 페이지(옵션, 빈값일 경우 1 기본세팅)"),
+			@Parameter(name = "limit", description = "페이지 사이즈(옵션, 빈값일 경우 10 기본세팅)") })
 	@GetMapping()
-	public ComResponseEntity<RoleReadListResDto> getRoleList(@RequestParam(value = "searchType", required = false) String searchType,
-                                                             @RequestParam(value = "keyword", required = false) String keyword,
-                                                             @RequestParam(value = "useYn", required = false) String useYn,
-                                                             @RequestParam(value = "currentPage", required = false) Integer currentPage,
-                                                             @RequestParam(value = "limit", required = false) Integer limit) throws Exception {
+	public ComResponseEntity<RoleReadListResDto> getRoleList(
+			@RequestParam(value = "searchType", required = false) String searchType,
+			@RequestParam(value = "keyword", required = false) String keyword,
+			@RequestParam(value = "useYn", required = false) String useYn,
+			@RequestParam(value = "currentPage", required = false) Integer currentPage,
+			@RequestParam(value = "limit", required = false) Integer limit) throws Exception {
 		RoleReadReqDto roleReadReqDto = new RoleReadReqDto();
 		roleReadReqDto.setUseYn(useYn);
 		roleReadReqDto.setSearchType(searchType);
@@ -99,8 +96,7 @@ public class RoleController {
 	 * 
 	 * @methodName : getRole
 	 * @author : cwcho
-	 * @param request
-	 * @param roleId
+	 * @param roleId : RoleID
 	 * @return
 	 * @throws Exception
 	 * @return : ResponseEntity<ComResponseDto<RoleReadResDto>>
@@ -125,11 +121,10 @@ public class RoleController {
 	 * 
 	 * @methodName : regRole
 	 * @author : cwcho
-	 * @param request
-	 * @param roleCreateReqDto
-	 * @return
-	 * @throws Exception
-	 * @return : ResponseEntity<ComResponseDto<Void>>
+	 * @param roleCreateReqDto : roleCreateReqDto
+	 * @return void
+	 * @throws Exception any
+	 * @return : ResponseEntity<ComResponseDto<Void>> respose
 	 * @description : 역할 등록
 	 */
 	@Operation(summary = "역할 등록", description = "역할 등록(Schemas > RoleCreateReqDto 참고)")
@@ -147,7 +142,6 @@ public class RoleController {
 	 * 
 	 * @methodName : updateRole
 	 * @author : cwcho
-	 * @param request
 	 * @param roleUpdateReqDto
 	 * @param roleId
 	 * @return
@@ -171,8 +165,6 @@ public class RoleController {
 	 * 
 	 * @methodName : removeRole
 	 * @author : cwcho
-	 * @param request
-	 * @param roleIds
 	 * @return
 	 * @return : ResponseEntity<ComResponseDto<Void>>
 	 * @description : 역할 삭제
@@ -190,7 +182,6 @@ public class RoleController {
 	 * 
 	 * @methodName : getRoleMenuScrnMapgList
 	 * @author : cwcho
-	 * @param request
 	 * @param roleId
 	 * @param menuId
 	 * @param screenId
@@ -200,11 +191,14 @@ public class RoleController {
 	 * @description : 역할-메뉴-화면 매핑 목록 조회
 	 */
 	@Operation(summary = "역할-메뉴-화면 매핑 목록 조회", description = "역할-메뉴-화면 매핑 목록 조회")
-	@Parameters({ @Parameter(name = "roleId", description = "역할 아이디(옵션)(equal 검색)"), @Parameter(name = "menuId", description = "메뉴 명(옵션)(equal 검색)"),
+	@Parameters({ @Parameter(name = "roleId", description = "역할 아이디(옵션)(equal 검색)"),
+			@Parameter(name = "menuId", description = "메뉴 명(옵션)(equal 검색)"),
 			@Parameter(name = "screenId", description = "화면 명(옵션)(equal 검색)") })
 	@GetMapping(value = "/role-menu-scrn")
-	public ComResponseEntity<RoleMenuScrnMapgReadListResDto> getRoleMenuScrnMapgList(@RequestParam(value = "roleId", required = false) String roleId, @RequestParam(value = "menuId", required = false) String menuId,
-																					 @RequestParam(value = "screenId", required = false) String screenId) throws Exception {
+	public ComResponseEntity<RoleMenuScrnMapgReadListResDto> getRoleMenuScrnMapgList(
+			@RequestParam(value = "roleId", required = false) String roleId,
+			@RequestParam(value = "menuId", required = false) String menuId,
+			@RequestParam(value = "screenId", required = false) String screenId) throws Exception {
 
 		RoleMenuScrnMapgReadReqDto roleMenuScrnMapgReadReqDto = new RoleMenuScrnMapgReadReqDto();
 		roleMenuScrnMapgReadReqDto.setRoleId(roleId);
@@ -213,7 +207,8 @@ public class RoleController {
 
 		// 전체 카운트 조회
 		int totalCount = roleSvc.selectRoleMenuScrnMapgCount(roleMenuScrnMapgReadReqDto);
-		List<RoleMenuScrnMapgReadResDto> roleMenuScrnMapgReadResDtoList = roleSvc.selectRoleMenuScrnMapg(roleMenuScrnMapgReadReqDto);
+		List<RoleMenuScrnMapgReadResDto> roleMenuScrnMapgReadResDtoList = roleSvc
+				.selectRoleMenuScrnMapg(roleMenuScrnMapgReadReqDto);
 		RoleMenuScrnMapgReadListResDto roleMenuScrnMapgReadListResDto = new RoleMenuScrnMapgReadListResDto();
 		roleMenuScrnMapgReadListResDto.setData(roleMenuScrnMapgReadResDtoList);
 		roleMenuScrnMapgReadListResDto.setTotalCount(totalCount);
@@ -235,7 +230,8 @@ public class RoleController {
 	@Operation(summary = "역할아이디 기준 모든 역할-메뉴-화면 매핑 정보를 갱신한다.(전체 삭제 후 등록)", description = "역할아이디 기준 모든 역할-메뉴-화면 매핑 정보를 갱신한다.(전체 삭제 후 등록)<br/>(Schemas > RoleMenuScrnMapgCreateReqDto 참고)")
 	@Parameters({ @Parameter(name = "roleId", description = "역할 아이디") })
 	@PutMapping("/role-menu-scrn/{roleId}")
-	public ComResponseEntity<Void> updateRoleMenuScrnMapg(HttpServletRequest request, @PathVariable(value = "roleId", required = true) String roleId,
+	public ComResponseEntity<Void> updateRoleMenuScrnMapg(HttpServletRequest request,
+			@PathVariable(value = "roleId", required = true) String roleId,
 			@Valid @RequestBody RoleMenuScrnMapgUpdateReqDto roleMenuScrnMapgCreateReqDto) throws Exception {
 
 		// 역할-메뉴-화면 정보 등록
@@ -275,7 +271,8 @@ public class RoleController {
 	@Operation(summary = "역할아이디 기준 역할-사용자 매핑 정보를 갱신한다.(전체 삭제 후 등록)", description = "역할아이디 기준 역할-사용자 매핑 정보를 갱신한다.(전체 삭제 후 등록)")
 	@Parameters({ @Parameter(name = "roleId", description = "역할 아이디") })
 	@PutMapping("/role-user/{roleId}")
-	public ComResponseEntity<Void> insertRoleUsrMapg(HttpServletRequest request, @PathVariable(value = "roleId", required = true) String roleId,
+	public ComResponseEntity<Void> insertRoleUsrMapg(HttpServletRequest request,
+			@PathVariable(value = "roleId", required = true) String roleId,
 			@Valid @RequestBody RoleUsrMapgUpdateReqDto roleUsrMapgUpdateReqDto) throws Exception {
 
 		// 역할-메뉴-화면 정보 등록(신규,삭제건이 없을수도 있으므로, 처리 건수는 체크하지 않는다.)

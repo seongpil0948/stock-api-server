@@ -27,73 +27,73 @@ spring:
     active: local
     # jvm argument 에 -Dspring.profiles.active=local 로 추가해서 하세요.
     # profie 선택에 따라 application-{profile}.yml 설정 파일을 선택 로딩하게됨
-  # # spring-boot thymeleaf 설정
-  # thymeleaf:
-  #   # view resolver 리턴시 thymeleaf/** 을 입력하면 thymeleaf뷰를 선택하도록 함
-  #   view-names: thymeleaf/*
-  #   # view 파일 위치
-  #   prefix: classpath:resources/view/
-  # # 스프링 시큐리티 설정
-  # security:
-  #   # 인증없이 접근할 수 있는 경로(none-servlet, 정적컨텐츠)
-  #   staticContents-url-patterns: /contents/**
-  #     ,/api-docs/**
-  #     ,/configuration/ui
-  #     ,/swagger-resources/**
-  #     ,/configuration/security
-  #     ,/swagger-ui.html
-  #     ,/webjars/**
-  #     ,/totalMgmt/**
-  #   # 인증없이 접근할 수 있는 경로(servlet)
-  #   permitAll-url-patterns: /swagger-ui/**
-  #     ,/login/**
-  #     ,/error/**
-  #     ,/common/encodePassword
-  #     ,/common/send-mail
-  #     ,/common/password-change
-  #     ,/common/encryptUtilTest
-  #     ,/welcome
-  #     ,/api-docs/**
-  #   # 인증된 모든 사용자가 접근가능한 경로(역할 구분 없음)
-  #   fullyAuthenticated-url-patterns:
-  #     /**
-  #     # /common/**
-  #     # ,/logout
+  # spring-boot thymeleaf 설정
+  thymeleaf:
+     # view resolver 리턴시 thymeleaf/** 을 입력하면 thymeleaf뷰를 선택하도록 함
+     view-names: thymeleaf/*
+     # view 파일 위치
+     prefix: classpath:resources/view/
+   # 스프링 시큐리티 설정
+  security:
+     # 인증없이 접근할 수 있는 경로(none-servlet, 정적컨텐츠)
+     staticContents-url-patterns: /contents/**
+       ,/api-docs/**
+       ,/configuration/ui
+       ,/swagger-resources/**
+       ,/configuration/security
+       ,/swagger-ui.html
+       ,/webjars/**
+       ,/totalMgmt/**
+     # 인증없이 접근할 수 있는 경로(servlet)
+     permitAll-url-patterns: /swagger-ui/**
+       ,/login/**
+       ,/error/**
+       ,/common/encodePassword
+       ,/common/send-mail
+       ,/common/password-change
+       ,/common/encryptUtilTest
+       ,/welcome
+       ,/api-docs/**
+     # 인증된 모든 사용자가 접근가능한 경로(역할 구분 없음)
+     fullyAuthenticated-url-patterns:
+       /**
+       # /common/**
+       # ,/logout
 
-  #   # 로그인 관련 설정
-  #   login:
-  #     # 로그인하지 않았을경우, redirection하는 url(만약 화면이 있다면 로그인 화면으로, 없다면 401 페이지로 리다이렉션)
-  #     page: /error/401
-  #     # 로그인 요청 경로(옵션, 지정하지 않을 경우, 로그인페이지와 동일 url로 post요청함)
-  #     processingUrl: /login
-  #     # 로그인 파라미터
-  #     user:
-  #       # 로그인 사용자의 id의 파라미터 명
-  #       id-param-name: info1
-  #       # 로그인 사용자의 id의 파라미터 명
-  #       pwd-param-name: info2
-  #     # 로그인 성공시 이동할 경로
-  #     successUrl: /
-  #     # 로그인 요청시 공개망구간 패스워드 암호화 키(화면->(암호화)->서버로그인API)
-  #     # AES256, javascript는 crypto.js 사용
-  #     # 32자리=256bit 암호화
-  #     secretKey: T7zLmnao78Rd4fQmmbTyG9o6jA9XGT9f
+     # 로그인 관련 설정
+     login:
+       # 로그인하지 않았을경우, redirection하는 url(만약 화면이 있다면 로그인 화면으로, 없다면 401 페이지로 리다이렉션)
+       page: /error/401
+       # 로그인 요청 경로(옵션, 지정하지 않을 경우, 로그인페이지와 동일 url로 post요청함)
+       processingUrl: /login
+       # 로그인 파라미터
+       user:
+         # 로그인 사용자의 id의 파라미터 명
+         id-param-name: info1
+         # 로그인 사용자의 id의 파라미터 명
+         pwd-param-name: info2
+       # 로그인 성공시 이동할 경로
+       successUrl: /
+       # 로그인 요청시 공개망구간 패스워드 암호화 키(화면->(암호화)->서버로그인API)
+       # AES256, javascript는 crypto.js 사용
+       # 32자리=256bit 암호화
+       secretKey: T7zLmnao78Rd4fQmmbTyG9o6jA9XGT9f
 
-  #   # 로그아웃 기능 정의(uvms 프로젝트에서는 사용 안함)
-  #   logout:
-  #     # 로그아웃 요청 경로(uvms 프로젝트에서는 사용 안함)
-  #     reqUrl: /logout
+     # 로그아웃 기능 정의(uvms 프로젝트에서는 사용 안함)
+     logout:
+       # 로그아웃 요청 경로(uvms 프로젝트에서는 사용 안함)
+       reqUrl: /logout
 
-  #     # 로그인 성공시 이동할 경로(uvms 프로젝트에서는 사용 안함)
-  #     # 빈값일 경우 동작안하고, 값을 입력하면 해당 url로 redirection함
-  #     successUrl: ""
-  # servlet:
-  #   # 첨부파일 업로드 관련 설정
-  #   multipart:
-  #     # 단일 파일당 용량 제한
-  #     max-file-size: 10MB
-  #     # 멀티업로드의 경우, 총용량 제한
-  #     max-request-size: 10MB
+       # 로그인 성공시 이동할 경로(uvms 프로젝트에서는 사용 안함)
+       # 빈값일 경우 동작안하고, 값을 입력하면 해당 url로 redirection함
+       successUrl: ""
+  servlet:
+     # 첨부파일 업로드 관련 설정
+     multipart:
+       # 단일 파일당 용량 제한
+       max-file-size: 10MB
+       # 멀티업로드의 경우, 총용량 제한
+       max-request-size: 10MB
 
 springdoc:
   api-docs:
@@ -112,3 +112,11 @@ springdoc:
   servers:
     - url: http://localhost:9090/api
       description: local
+# path variable 특수문자 제외
+id:
+  id-pattern: ^[a-zA-Zㄱ-힣0-9|_|\s]*$
+pw:
+  password-pattern: ^(?=.*[A-Za-z])(?=.*\d)(?=.*[$@$!%*#?&])[A-Za-z\d$@$!%*#?&]{8,}$
+
+security:
+  key: 'key 키 required'

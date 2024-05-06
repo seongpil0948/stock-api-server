@@ -1,6 +1,6 @@
-package kr.co.dsi.system.role.dto.req;
+package com.stock.sp.apiserver.system.role.dto.req;
 
-import kr.co.dsi.common.dto.web.ComPageDto;
+import com.stock.sp.apiserver.common.dto.web.ComPageDto;
 import io.swagger.v3.oas.annotations.media.Schema;
 
 /**
@@ -20,7 +20,7 @@ public class RoleReadReqDto extends ComPageDto {
 	 */
 	@Schema(description = "검색어", example = "시스템관리자", required = false, minLength = 1, maxLength = 100)
 	private String keyword;
-	
+
 	/**
 	 * 사용 여부
 	 */

@@ -1,10 +1,10 @@
 package com.stock.sp.apiserver.ticker.dto.req;
 
 import io.swagger.v3.oas.annotations.media.Schema;
-import jakarta.annotation.Nullable;
-import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
+import jakarta.annotation.Nullable;
+import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.NotBlank;
 
 @AllArgsConstructor
 @Schema(name = "TickerReadListReqDto", description = "Ticker 목록 조회 파라미터")

@@ -1,4 +1,4 @@
-package kr.co.dsi.spring.component;
+package com.stock.sp.apiserver.spring.component;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.http.MediaType;

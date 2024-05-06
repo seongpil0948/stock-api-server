@@ -1,4 +1,4 @@
-package kr.co.dsi.common.dto;
+package com.stock.sp.apiserver.common.dto;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import io.swagger.v3.oas.annotations.media.Schema;

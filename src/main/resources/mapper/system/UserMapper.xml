@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
-<mapper namespace="kr.co.dsi.system.user">
+<mapper namespace="com.stock.sp.apiserver.system.user">
 
 	<sql id="userSelect">
 		SELECT
@@ -86,9 +86,9 @@
 		</if>
 	</sql>
 
-	<select id="selectUserTotalCount" parameterType="kr.co.dsi.system.user.dto.req.UserSearchReqDto" resultType="java.lang.Integer">
+	<select id="selectUserTotalCount" parameterType="com.stock.sp.apiserver.system.user.dto.req.UserSearchReqDto" resultType="java.lang.Integer">
 		/*
-		SQL ID : kr.co.dsi.system.user.selectUserTotalCount
+		SQL ID : com.stock.sp.apiserver.system.user.selectUserTotalCount
 		SQL 명: 단일 사용자 또는 목록 카운트 조회(관리자 용도)
 		*/
 		SELECT COUNT(TB.ROW_NUM)
@@ -98,9 +98,9 @@
 			) USER ) TB
 	</select>
 
-	<select id="selectUserList" parameterType="kr.co.dsi.system.user.dto.req.UserSearchReqDto" resultType="kr.co.dsi.system.user.dto.res.UserReadResDto">
+	<select id="selectUserList" parameterType="com.stock.sp.apiserver.system.user.dto.req.UserSearchReqDto" resultType="com.stock.sp.apiserver.system.user.dto.res.UserReadResDto">
 		/*
-		SQL ID : kr.co.dsi.system.user.selectUserList
+		SQL ID : com.stock.sp.apiserver.system.user.selectUserList
 		SQL 명: 단일 사용자 또는 목록 조회(관리자 용도)
 		*/
 		<include refid="userSelect"/>
@@ -110,9 +110,9 @@
 		LIMIT #{rowStart}, #{limit}		
 	</select>
 
-	<select id="selectUser" parameterType="java.lang.String" resultType="kr.co.dsi.system.user.dto.res.UserReadResDto">
+	<select id="selectUser" parameterType="java.lang.String" resultType="com.stock.sp.apiserver.system.user.dto.res.UserReadResDto">
 		/*
-		SQL ID : kr.co.dsi.system.user.selectUser
+		SQL ID : com.stock.sp.apiserver.system.user.selectUser
 		SQL 명: 단일 사용자 또는 목록 조회(관리자 용도)
 		*/
 		SELECT
@@ -182,9 +182,9 @@
 		</where>) USER
 	</select>
 
-	<insert id="insertUser" parameterType="kr.co.dsi.system.user.dto.req.UserCreateReqDto">
+	<insert id="insertUser" parameterType="com.stock.sp.apiserver.system.user.dto.req.UserCreateReqDto">
         /*
-        SQL ID : kr.co.dsi.system.user.insertUser
+        SQL ID : com.stock.sp.apiserver.system.user.insertUser
         SQL 명: 사용자 추가(풀수 컬럼만)
         */
         INSERT INTO TB_USER (
@@ -213,9 +213,9 @@
         )
     </insert>
 
-	<update id="updateUser" parameterType="kr.co.dsi.system.user.dto.req.UserUpdateReqDto">
+	<update id="updateUser" parameterType="com.stock.sp.apiserver.system.user.dto.req.UserUpdateReqDto">
 		/*
-		SQL ID : kr.co.dsi.system.user.updateUser
+		SQL ID : com.stock.sp.apiserver.system.user.updateUser
 		SQL 명: 사용자 정보 수정
 		*/
 		UPDATE TB_USER
@@ -244,9 +244,9 @@
 		WHERE USER_ID = #{userId, jdbcType=VARCHAR}
 	</update>
 
-	<update id="updateUserPwd" parameterType="kr.co.dsi.system.user.dto.req.UserUpdatePswdReqDto">
+	<update id="updateUserPwd" parameterType="com.stock.sp.apiserver.system.user.dto.req.UserUpdatePswdReqDto">
 		/*
-		SQL ID : kr.co.dsi.system.user.updateUserPwd
+		SQL ID : com.stock.sp.apiserver.system.user.updateUserPwd
 		SQL 명: 사용자 패스워드 수정
 		*/
 		UPDATE TB_USER
@@ -262,7 +262,7 @@
 
 	<delete id="deleteUser" parameterType="java.lang.String">
 		/*
-		SQL ID : kr.co.dsi.system.user.deleteUser
+		SQL ID : com.stock.sp.apiserver.system.user.deleteUser
 		SQL 명: 사용자 정보 삭제
 		*/
 		DELETE FROM TB_USER
@@ -273,7 +273,7 @@
 
 	<select id="checkDuplicateUser" parameterType="java.lang.String" resultType="java.lang.String">
         /*
-        SQL ID : kr.co.dsi.system.user.checkUser
+        SQL ID : com.stock.sp.apiserver.system.user.checkUser
         SQL 명: 사용자정보에 이미 동일한 아이디가 있는지 체크한다.
         */
         SELECT
@@ -285,16 +285,16 @@
 
 	<delete id="deleteRoleUser" parameterType="java.lang.String">
         /*
-        SQL ID : kr.co.dsi.system.user.deleteRoleUser
+        SQL ID : com.stock.sp.apiserver.system.user.deleteRoleUser
         SQL 명: 고객사 사용자 역할 삭제
         */
         DELETE FROM TB_ROLE_USER_MAPG
         WHERE USER_ID = #{userId, jdbcType=VARCHAR}
     </delete>
 
-	<insert id="insertRoleUser" parameterType="kr.co.dsi.system.user.dto.req.UserCreateReqDto">
+	<insert id="insertRoleUser" parameterType="com.stock.sp.apiserver.system.user.dto.req.UserCreateReqDto">
         /*
-        SQL ID : kr.co.dsi.system.user.insertRoleUser
+        SQL ID : com.stock.sp.apiserver.system.user.insertRoleUser
         SQL 명: 사용자 역할 추가
         */
         INSERT INTO TB_ROLE_USER_MAPG
@@ -318,16 +318,16 @@
 
 	<delete id="deleteRoleUser2" parameterType="java.lang.String">
         /*
-        SQL ID : kr.co.dsi.system.user.deleteRoleUser
+        SQL ID : com.stock.sp.apiserver.system.user.deleteRoleUser
         SQL 명: 사용자 역할 삭제(user id, cuco id 조건)
         */
         DELETE FROM TB_ROLE_USER_MAPG
         WHERE USER_ID = #{userId}
     </delete>
 
-	<update id="updateRoleUser" parameterType="kr.co.dsi.system.user.dto.RoleUserMapgDto">
+	<update id="updateRoleUser" parameterType="com.stock.sp.apiserver.system.user.dto.RoleUserMapgDto">
         /*
-        SQL ID : kr.co.dsi.system.user.updateRoleUser
+        SQL ID : com.stock.sp.apiserver.system.user.updateRoleUser
         SQL 명: 사용자 역할 업데이트
         */
         UPDATE TB_ROLE_USER_MAPG
@@ -359,10 +359,10 @@
 		</where>
 	</sql>
 
-	<select id="selectRoleUserList" parameterType="kr.co.dsi.system.user.dto.req.RoleUserSearchReqDto"
-			resultType="kr.co.dsi.system.user.dto.res.RoleUserReadResDto">
+	<select id="selectRoleUserList" parameterType="com.stock.sp.apiserver.system.user.dto.req.RoleUserSearchReqDto"
+			resultType="com.stock.sp.apiserver.system.user.dto.res.RoleUserReadResDto">
 		/*
-		SQL ID : kr.co.dsi.system.user.selectRoleUserList
+		SQL ID : com.stock.sp.apiserver.system.user.selectRoleUserList
 		SQL 명: 사용자 역할 조회
 		*/
 		<include refid="roleUserSelect"/>
@@ -371,10 +371,10 @@
 		LIMIT #{rowStart}, #{limit}
 	</select>
 
-	<select id="selectRoleUserTotalCount" parameterType="kr.co.dsi.system.user.dto.req.RoleUserSearchReqDto"
+	<select id="selectRoleUserTotalCount" parameterType="com.stock.sp.apiserver.system.user.dto.req.RoleUserSearchReqDto"
 			resultType="java.lang.Integer">
 		/*
-		SQL ID : kr.co.dsi.system.user.selectRoleUserTotalCount
+		SQL ID : com.stock.sp.apiserver.system.user.selectRoleUserTotalCount
 		SQL 명: 사용자 역할 조회(Count)
 		*/
 		SELECT COUNT(TB.USER_ID)
