@@ -19,10 +19,14 @@ spring:
   application:
     name: stock-api-server
   datasource:
-    driver-class-name: org.postgresql.Driver
-    url: jdbc:postgresql://localhost:5432/stock
-    username: choeseongpil
-    password: 0525
+    # driver-class-name: org.postgresql.Driver
+    # url: jdbc:postgresql://localhost:5432/stock
+    # username: choeseongpil
+    # password: 0525
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    url: jdbc:mysql://localhost:3306/framework
+    username: root
+    password: 1234qwer!!    
   profiles:
     active: local
     # jvm argument 에 -Dspring.profiles.active=local 로 추가해서 하세요.

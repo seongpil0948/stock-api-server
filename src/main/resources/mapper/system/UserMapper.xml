@@ -30,7 +30,7 @@
 				, U.REG_USER_ID AS CREATE_USER_ID
 				, DATE_FORMAT(U.UPD_DT, '%Y-%m-%d')  AS UPDATE_DATE
 				, U.UPD_USER_ID                      AS UPDATE_USER_ID
-				, U.BAS_BRCH
+								<!-- , U.BAS_BRCH -->
 				, CITY.CD_NM                         AS LTNO_CITY_NM
 				, COUNTY.CD_NM                       AS LTNO_SGG_NM
 				, DISTRICT.CD_NM                     AS LTNO_EMD_NM
@@ -93,8 +93,8 @@
 		*/
 		SELECT COUNT(TB.ROW_NUM)
 			FROM (
-				<include refid="userSelect"/>
-				<include refid="userSearch"/>
+		<include refid="userSelect"/>
+		<include refid="userSearch"/>
 			) USER ) TB
 	</select>
 
@@ -146,7 +146,7 @@
 				, U.REG_USER_ID                      AS CREATE_USER_ID
 				, DATE_FORMAT(U.UPD_DT, '%Y-%m-%d')  AS UPDATE_DATE
 				, U.UPD_USER_ID                      AS UPDATE_USER_ID
-				, U.BAS_BRCH
+								<!-- , U.BAS_BRCH -->
 			    , BRCH.CD_NM                         AS BAS_BRCH_NM
 				, CITY.CD_NM                         AS LTNO_CITY_NM
 				, CITY.CD                            AS LTNO_CITY_CODE
@@ -154,13 +154,13 @@
 			    , COUNTY.CD                          AS LTNO_SGG_CODE
 				, DISTRICT.CD_NM                     AS LTNO_EMD_NM
 			    , DISTRICT.CD                        AS LTNO_EMD_CODE
-				, U.EMPNUM                           AS EMPLOYEE_NUM
+						<!-- , U.EMPNUM                           AS EMPLOYEE_NUM -->
 				, A.ROLE_NM                          AS ROLE_NAME
 				, A.ROLE_ID
 				, U.STAT_CD
 				, CODE.CD_NM                         AS STAT_CD_NM
 			FROM TB_USER U
-			LEFT JOIN TB_ROLE_USER_MAPG AUM
+									<!-- LEFT JOIN TB_ROLE_USER_MAPG AUM
 				ON U.USER_ID = AUM.USER_ID
 			LEFT JOIN TB_ROLE A
 				ON AUM.ROLE_ID = A.ROLE_ID
@@ -176,7 +176,7 @@
 			LEFT JOIN TB_CD COUNTY
 				ON U.LTNO_SGG_NM = COUNTY.CD
 			LEFT JOIN TB_CD DISTRICT
-				ON U.LTNO_EMD_NM = DISTRICT.CD
+				ON U.LTNO_EMD_NM = DISTRICT.CD -->
 		<where>
 				AND U.USER_ID = #{userId}
 		</where>) USER
@@ -211,7 +211,7 @@
         , CURRENT_TIMESTAMP()
         , #{regUserId, jdbcType=VARCHAR}
         )
-    </insert>
+	</insert>
 
 	<update id="updateUser" parameterType="com.stock.sp.apiserver.system.user.dto.req.UserUpdateReqDto">
 		/*
@@ -281,7 +281,7 @@
         FROM TB_USER A
         WHERE
         A.USER_ID = #{userId}
-    </select>
+	</select>
 
 	<delete id="deleteRoleUser" parameterType="java.lang.String">
         /*
@@ -290,7 +290,7 @@
         */
         DELETE FROM TB_ROLE_USER_MAPG
         WHERE USER_ID = #{userId, jdbcType=VARCHAR}
-    </delete>
+	</delete>
 
 	<insert id="insertRoleUser" parameterType="com.stock.sp.apiserver.system.user.dto.req.UserCreateReqDto">
         /*
@@ -314,7 +314,7 @@
         , CURRENT_TIMESTAMP()
         , #{regUserId}
         )
-    </insert>
+	</insert>
 
 	<delete id="deleteRoleUser2" parameterType="java.lang.String">
         /*
@@ -323,7 +323,7 @@
         */
         DELETE FROM TB_ROLE_USER_MAPG
         WHERE USER_ID = #{userId}
-    </delete>
+	</delete>
 
 	<update id="updateRoleUser" parameterType="com.stock.sp.apiserver.system.user.dto.RoleUserMapgDto">
         /*
@@ -333,7 +333,7 @@
         UPDATE TB_ROLE_USER_MAPG
         SET ROLE_ID = #{roleId}
         WHERE USER_ID = #{userId}
-    </update>
+	</update>
 
 	<sql id="roleUserSelect">
 		SELECT
@@ -359,8 +359,7 @@
 		</where>
 	</sql>
 
-	<select id="selectRoleUserList" parameterType="com.stock.sp.apiserver.system.user.dto.req.RoleUserSearchReqDto"
-			resultType="com.stock.sp.apiserver.system.user.dto.res.RoleUserReadResDto">
+	<select id="selectRoleUserList" parameterType="com.stock.sp.apiserver.system.user.dto.req.RoleUserSearchReqDto" resultType="com.stock.sp.apiserver.system.user.dto.res.RoleUserReadResDto">
 		/*
 		SQL ID : com.stock.sp.apiserver.system.user.selectRoleUserList
 		SQL 명: 사용자 역할 조회
@@ -371,8 +370,7 @@
 		LIMIT #{rowStart}, #{limit}
 	</select>
 
-	<select id="selectRoleUserTotalCount" parameterType="com.stock.sp.apiserver.system.user.dto.req.RoleUserSearchReqDto"
-			resultType="java.lang.Integer">
+	<select id="selectRoleUserTotalCount" parameterType="com.stock.sp.apiserver.system.user.dto.req.RoleUserSearchReqDto" resultType="java.lang.Integer">
 		/*
 		SQL ID : com.stock.sp.apiserver.system.user.selectRoleUserTotalCount
 		SQL 명: 사용자 역할 조회(Count)
@@ -385,9 +383,7 @@
 		ORDER BY TU.REG_DT) TB
 	</select>
 
-	<select id="selectCucoUserMasterYn"
-		parameterType="java.lang.String"
-		resultType="java.lang.String">
+	<select id="selectCucoUserMasterYn" parameterType="java.lang.String" resultType="java.lang.String">
 		/**
 		* SQL ID : co.kr.rp.mgmt.dao.CucoDao.selectCucoUserMasterYn
 		* SQL 명: 고객사 사용자 마스터 여부 조회
@@ -396,5 +392,5 @@
 		FROM TB_USER
 		WHERE USER_ID = #{userId, jdbcType=VARCHAR}
 	</select>
-	
+
 </mapper>

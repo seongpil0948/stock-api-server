@@ -2,7 +2,7 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.stock.sp.apiserver.common.login">
 
-	<select id="selectUserEncPswd" parameterType="java.lang.String" resultType="java.lang.String">
+    <select id="selectUserEncPswd" parameterType="java.lang.String" resultType="java.lang.String">
         /*
         SQL ID : com.stock.sp.apiserver.system.login.dao.LginDao.selectUserEncPswd
         SQL 명: 사용자 패스워드 조회
@@ -15,7 +15,7 @@
         AND TU.STAT_CD = 'ACTIVE'
     </select>
 
-	<select id="selectUser" parameterType="java.lang.String" resultType="com.stock.sp.apiserver.common.login.dto.res.LoginUserDto">
+    <select id="selectUser" parameterType="java.lang.String" resultType="com.stock.sp.apiserver.common.login.dto.res.LoginUserDto">
         /*
         SQL ID : com.stock.sp.apiserver.system.login.dao.LginDao.selectUser
         SQL 명: 로그인할 사용자 조회
