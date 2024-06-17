@@ -1,47 +1,39 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.stock.sp.apiserver.ticker.dao.TickerDao">
-  <select 
-    id="selectTickerList" 
-    parameterType="com.stock.sp.apiserver.ticker.dto.req.TickerReadListReqDto"
-    resultType="com.stock.sp.apiserver.ticker.entity.Ticker"
-  >
-    SELECT sp."date"
-      ,sp.ticker
-      ,sp.labelko as labelKo
-      ,sp.labelen as labelEn
-      ,sp."open"
-      ,sp.high
-      ,sp.low
-      ,sp."close"
-      ,sp.volume 
-    FROM stock_prices as sp
+  <select id="selectTickerList" parameterType="com.stock.sp.apiserver.ticker.dto.req.TickerReadListReqDto" resultType="com.stock.sp.apiserver.ticker.entity.Ticker">
+    SELECT SP.`DATE`
+      ,SP.TICKER
+      ,SP.LABELKO
+      ,SP.LABELEN
+      ,SP.`OPEN`
+      ,SP.HIGH
+      ,SP.LOW
+      ,SP.`CLOSE`
+      ,SP.VOLUME 
+    FROM STOCK_PRICES AS SP
     WHERE 1=1
-      <if test="ticker != null">
-        AND sp.ticker = cast(#{ticker} as varchar(10))
-      </if>
-      <if test="startDate != null and endDate != null">
-        AND sp."date" BETWEEN CAST(#{startDate} AS DATE) AND CAST(#{endDate} AS DATE)
-      </if>
+    <if test="ticker != null">
+        AND SP.TICKER = CAST(#{ticker} AS CHAR(10))
+    </if>
+    <if test="startDate != null and endDate != null">
+        AND SP.`DATE` BETWEEN CAST(#{startDate} AS DATE) AND CAST(#{endDate} AS DATE)
+    </if>
   </select>
 
-  <select 
-    id="selectTicker" 
-    parameterType="com.stock.sp.apiserver.ticker.dto.req.TickerReadReqDto"
-    resultType="com.stock.sp.apiserver.ticker.entity.Ticker"
-  >
-    SELECT sp."date"
-      ,sp.ticker
-      ,sp.labelko as labelKo
-      ,sp.labelen as labelEn
-      ,sp."open"
-      ,sp.high
-      ,sp.low
-      ,sp."close"
-      ,sp.volume 
-    FROM stock_prices as sp
-    WHERE sp.ticker = cast(#{ticker} as varchar(10))
-      and CAST(sp."date" = #{date} AS DATE)
+  <select id="selectTicker" parameterType="com.stock.sp.apiserver.ticker.dto.req.TickerReadReqDto" resultType="com.stock.sp.apiserver.ticker.entity.Ticker">
+    SELECT SP.`DATE`
+      ,SP.TICKER
+      ,SP.LABELKO
+      ,SP.LABELEN
+      ,SP.`OPEN`
+      ,SP.HIGH
+      ,SP.LOW
+      ,SP.`CLOSE`
+      ,SP.VOLUME 
+    FROM STOCK_PRICES AS SP
+    WHERE SP.TICKER = CAST(#{ticker} AS CHAR(10))
+      AND CAST(SP.`DATE` AS DATE) = #{date}
   </select>
 
-</mapper>  
+</mapper>
