@@ -22,9 +22,11 @@ public class SecurityConfig {
 		http
 				// .addFilterBefore(new TenantFilter(), AuthorizationFilter.class)
 				// .addFilter(new TenantFilter())
-				.csrf(Customizer.withDefaults())
-				// .authorizeHttpRequests(authorize -> authorize.anyRequest().authenticated())
 				.authorizeHttpRequests(authorize -> authorize.anyRequest().permitAll())
+				// .csrf(Customizer.withDefaults())
+				// FIXME: CSRF is disabled for now, but it should be enabled in a real
+				// application
+				.csrf(csrf -> csrf.disable())
 				.httpBasic(Customizer.withDefaults())
 				.formLogin(Customizer.withDefaults());
 

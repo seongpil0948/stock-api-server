@@ -124,3 +124,18 @@ pw:
 
 security:
   key: 'key 키 required'
+
+logging:
+  level:
+    org:
+      springframework:
+        web:
+          servlet:
+            dispatcher:
+              DispatcherServlet: DEBUG
+    com:
+      choeseongpil:
+        stock:
+          controller: DEBUG
+          service: DEBUG
+          repository: DEBUG
