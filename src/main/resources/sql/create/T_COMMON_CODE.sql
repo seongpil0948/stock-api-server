@@ -1,0 +1,13 @@
+CREATE TABLE IF NOT EXISTS T_COMMON_CODE (
+  `CD_GRP` varchar(50) DEFAULT NULL,
+  `CD` varchar(50) DEFAULT NULL,
+  `USE_YN` varchar(1) DEFAULT NULL,
+  `CD_IDX` tinyint NOT NULL,
+  `CD_NM` varchar(100) DEFAULT NULL,
+  `CD_DSCR` varchar(500) DEFAULT NULL,
+  `CD_VLUE` varchar(100) DEFAULT NULL,
+  `REG_DT` timestamp NOT NULL,
+  `REG_USER_ID` varchar(50) DEFAULT NULL,
+  `UPD_DT` timestamp NULL DEFAULT NULL,
+  `UPD_USER_ID` varchar(50) DEFAULT NULL
+) 

@@ -70,7 +70,7 @@ public class UserController {
 	@Operation(summary = "사용자 조회", description = "사용자 조회")
 	@Parameters({
 			@Parameter(name = "searchType", description = "검색 조건 <br><br>ALL : 전체 " +
-					"<br><br> USER_NM : 계정 명 <br><br> USER_ID : 사용자 아이디(사번)", example = "ALL", schema = @Schema(type = "string")),
+					"<br><br> USER_NM : 계정 명 <br><br> userId : 사용자 아이디(사번)", example = "ALL", schema = @Schema(type = "string")),
 			@Parameter(name = "keyword", description = "검색어", schema = @Schema(type = "string")),
 			@Parameter(name = "statCd", description = "활성화 여부 <br><br>ALL : 전체 " +
 					"<br><br> ACTIVE : 활성화 <br><br> INACTIVE : 비활성화", example = "ALL", schema = @Schema(type = "string")),

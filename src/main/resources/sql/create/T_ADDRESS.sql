@@ -1,5 +1,5 @@
-CREATE TABLE IF NOT EXISTS Address (
-    id BINARY(16) NOT NULL,
+CREATE TABLE IF NOT EXISTS T_ADDRESS (
+    addressId BINARY(16) NOT NULL,
     alias VARCHAR(100) NOT NULL,
     latitude DOUBLE,
     longitude DOUBLE,
@@ -14,21 +14,26 @@ CREATE TABLE IF NOT EXISTS Address (
     town VARCHAR(100),
     PRIMARY KEY (id)
 );
--- 
+
+DELIMITER $$
 
 CREATE PROCEDURE AddForeignKeyIfNotExists()
 BEGIN
-    IF NOT EXISTS (
-        SELECT 1
-        FROM information_schema.REFERENTIAL_CONSTRAINTS
-        WHERE CONSTRAINT_NAME = 'fk_defaultAddressID'
-          AND CONSTRAINT_SCHEMA = DATABASE()
-    ) THEN
+    DECLARE fk_exists INT DEFAULT 0;
+
+    SELECT COUNT(*)
+    INTO fk_exists
+    FROM INFORMATION_SCHEMA.TABLE_CONSTRAINTS
+    WHERE CONSTRAINT_NAME = 'fk_defaultAddressID'
+      AND TABLE_SCHEMA = DATABASE()
+      AND TABLE_NAME = 'User';
+
+    IF fk_exists = 0 THEN
         ALTER TABLE User
         ADD CONSTRAINT fk_defaultAddressID
-        FOREIGN KEY (defaultAddressID) REFERENCES Address(id);
+        FOREIGN KEY (defaultAddressID) REFERENCES T_ADDRESS(id);
     END IF;
-END //
+END $$
 
 DELIMITER ;
 

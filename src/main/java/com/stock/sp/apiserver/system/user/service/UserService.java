@@ -113,10 +113,10 @@ public class UserService {
 		encryptPswd = passwordEncoder.encode(userPswd);
 		userCreateReqDto.setPswd(encryptPswd);
 
-		String userId = commonDao.select(USER_NAME_SPACE.concat("checkDuplicateUser"), userCreateReqDto.getUserId());
-		if (!StringUtils.isEmpty(userId)) {
-			throw new BizException("duplicated_usr");
-		}
+		// String userId = commonDao.select(USER_NAME_SPACE.concat("checkDuplicateUser"), userCreateReqDto.getUserId());
+		// if (!StringUtils.isEmpty(userId)) {
+		// 	throw new BizException("duplicated_usr");
+		// }
 
 		Integer result = commonDao.insert(USER_NAME_SPACE.concat("insertUser"), userCreateReqDto);
 		commonDao.insert(USER_NAME_SPACE.concat("insertRoleUser"), userCreateReqDto);

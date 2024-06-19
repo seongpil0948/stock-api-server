@@ -5,7 +5,7 @@
 	<sql id="userSelect">
 		SELECT
 			  ROW_NUMBER() OVER(ORDER BY USER.CREATE_DATE) AS ROW_NUM
-			, USER.USER_ID
+			, USER.userId
 			, USER.USE_YN
 			, USER.USER_NM
 			, USER.CREATE_DATE
@@ -23,7 +23,7 @@
 			, USER.STAT_CD_NM
 		FROM (
 			SELECT
-				  U.USER_ID
+				  U.userId
 				, U.USE_YN
 				, U.USER_NM
 				, DATE_FORMAT(U.REG_DT, '%Y-%m-%d')  AS CREATE_DATE
@@ -39,19 +39,19 @@
 				, A.ROLE_ID
 				, U.STAT_CD
 				, CODE.CD_NM                         AS STAT_CD_NM
-			FROM TB_USER U
+			FROM T_USER U
 			LEFT JOIN TB_ROLE_USER_MAPG AUM
-				ON U.USER_ID = AUM.USER_ID
+				ON U.userId = AUM.userId
 			LEFT JOIN TB_ROLE A
 				ON AUM.ROLE_ID = A.ROLE_ID
-			LEFT JOIN TB_CD CODE
+			LEFT JOIN T_COMMON_CODE CODE
 				ON U.STAT_CD = CODE.CD
 					AND CODE.CD_GRP = 'STUS_CD'
-			LEFT JOIN TB_CD CITY
+			LEFT JOIN T_COMMON_CODE CITY
 					  ON U.LTNO_CITY_NM = CITY.CD
-			LEFT JOIN TB_CD COUNTY
+			LEFT JOIN T_COMMON_CODE COUNTY
 					  ON U.LTNO_SGG_NM = COUNTY.CD
-			LEFT JOIN TB_CD DISTRICT
+			LEFT JOIN T_COMMON_CODE DISTRICT
 					  ON U.LTNO_EMD_NM = DISTRICT.CD
 			WHERE 1=1
 	</sql>
@@ -62,14 +62,14 @@
 				<when test="searchType == 'ALL'">
 					AND (
 						U.USER_NM LIKE CONCAT('%', REGEXP_REPLACE(#{keyword}, '(\_|\%)', '\\\\\\1'), '%') OR
-						U.USER_ID LIKE CONCAT('%', REGEXP_REPLACE(#{keyword}, '(\_|\%)', '\\\\\\1'), '%')
+						U.userId LIKE CONCAT('%', REGEXP_REPLACE(#{keyword}, '(\_|\%)', '\\\\\\1'), '%')
 					)
 				</when>
 				<when test="searchType == 'USER_NAME'">
 					AND U.USER_NM LIKE CONCAT('%', REGEXP_REPLACE(#{keyword}, '(\_|\%)', '\\\\\\1'), '%')
 				</when>
-				<when test="searchType == 'USER_ID'">
-					AND U.USER_ID LIKE CONCAT('%', REGEXP_REPLACE(#{keyword}, '(\_|\%)', '\\\\\\1'), '%')
+				<when test="searchType == 'userId'">
+					AND U.userId LIKE CONCAT('%', REGEXP_REPLACE(#{keyword}, '(\_|\%)', '\\\\\\1'), '%')
 				</when>
 			</choose>
 		</if>
@@ -117,7 +117,7 @@
 		*/
 		SELECT
 			  ROW_NUMBER() OVER(ORDER BY USER.CREATE_DATE) AS NUM
-			, USER.USER_ID
+			, USER.userId
 			, USER.USE_YN
 			, USER.USER_NM
 			, USER.CREATE_DATE
@@ -139,7 +139,7 @@
 			, USER.STAT_CD_NM
 		FROM (
 			SELECT
-				  U.USER_ID
+				  U.userId
 				, U.USE_YN
 				, U.USER_NM
 				, DATE_FORMAT(U.REG_DT, '%Y-%m-%d')  AS CREATE_DATE
@@ -159,26 +159,26 @@
 				, A.ROLE_ID
 				, U.STAT_CD
 				, CODE.CD_NM                         AS STAT_CD_NM
-			FROM TB_USER U
+			FROM T_USER U
 									<!-- LEFT JOIN TB_ROLE_USER_MAPG AUM
-				ON U.USER_ID = AUM.USER_ID
+				ON U.userId = AUM.userId
 			LEFT JOIN TB_ROLE A
 				ON AUM.ROLE_ID = A.ROLE_ID
-			LEFT JOIN TB_CD CODE
+			LEFT JOIN T_COMMON_CODE CODE
 				ON U.STAT_CD = CODE.CD
 					AND CODE.CD_GRP = 'STUS_CD'
-			LEFT JOIN TB_CD BRCH
+			LEFT JOIN T_COMMON_CODE BRCH
 			ON BRCH.CD = U.BAS_BRCH
 			    AND BRCH.CD_GRP = 'BRCH_CD'
-			LEFT JOIN TB_CD CITY
+			LEFT JOIN T_COMMON_CODE CITY
 				ON U.LTNO_CITY_NM = CITY.CD
 			    AND CITY.CD_GRP = BRCH.CD
-			LEFT JOIN TB_CD COUNTY
+			LEFT JOIN T_COMMON_CODE COUNTY
 				ON U.LTNO_SGG_NM = COUNTY.CD
-			LEFT JOIN TB_CD DISTRICT
+			LEFT JOIN T_COMMON_CODE DISTRICT
 				ON U.LTNO_EMD_NM = DISTRICT.CD -->
 		<where>
-				AND U.USER_ID = #{userId}
+				AND U.userId = #{userId}
 		</where>) USER
 	</select>
 
@@ -187,8 +187,8 @@
         SQL ID : com.stock.sp.apiserver.system.user.insertUser
         SQL 명: 사용자 추가(풀수 컬럼만)
         */
-        INSERT INTO TB_USER (
-		USER_ID
+        INSERT INTO T_USER (
+		userId
         , USER_NM
         , PSWD
         , BAS_BRCH
@@ -218,7 +218,7 @@
 		SQL ID : com.stock.sp.apiserver.system.user.updateUser
 		SQL 명: 사용자 정보 수정
 		*/
-		UPDATE TB_USER
+		UPDATE T_USER
 		<set>
 			<if test="userNm != null">
 				USER_NM = #{userNm, jdbcType=VARCHAR},
@@ -241,7 +241,7 @@
 			UPD_DT = CURRENT_TIMESTAMP(),
 			UPD_USER_ID = #{updUserId, jdbcType=VARCHAR},
 		</set>
-		WHERE USER_ID = #{userId, jdbcType=VARCHAR}
+		WHERE userId = #{userId, jdbcType=VARCHAR}
 	</update>
 
 	<update id="updateUserPwd" parameterType="com.stock.sp.apiserver.system.user.dto.req.UserUpdatePswdReqDto">
@@ -249,7 +249,7 @@
 		SQL ID : com.stock.sp.apiserver.system.user.updateUserPwd
 		SQL 명: 사용자 패스워드 수정
 		*/
-		UPDATE TB_USER
+		UPDATE T_USER
 		<set>
 			<if test="pswd != null">
 				PSWD = #{pswd, jdbcType=VARCHAR},
@@ -257,7 +257,7 @@
 			UPD_DT = CURRENT_TIMESTAMP(),
 			UPD_USER_ID = #{updUserId, jdbcType=VARCHAR},
 		</set>
-		WHERE USER_ID = #{userId, jdbcType=VARCHAR}
+		WHERE userId = #{userId, jdbcType=VARCHAR}
 	</update>
 
 	<delete id="deleteUser" parameterType="java.lang.String">
@@ -265,9 +265,9 @@
 		SQL ID : com.stock.sp.apiserver.system.user.deleteUser
 		SQL 명: 사용자 정보 삭제
 		*/
-		DELETE FROM TB_USER
+		DELETE FROM T_USER
 		<where>
-			USER_ID = #{userId, jdbcType=VARCHAR}
+			userId = #{userId, jdbcType=VARCHAR}
 		</where>
 	</delete>
 
@@ -277,10 +277,10 @@
         SQL 명: 사용자정보에 이미 동일한 아이디가 있는지 체크한다.
         */
         SELECT
-        A.USER_ID
-        FROM TB_USER A
+        A.userId
+        FROM T_USER A
         WHERE
-        A.USER_ID = #{userId}
+        A.userId = #{userId}
 	</select>
 
 	<delete id="deleteRoleUser" parameterType="java.lang.String">
@@ -289,7 +289,7 @@
         SQL 명: 고객사 사용자 역할 삭제
         */
         DELETE FROM TB_ROLE_USER_MAPG
-        WHERE USER_ID = #{userId, jdbcType=VARCHAR}
+        WHERE userId = #{userId, jdbcType=VARCHAR}
 	</delete>
 
 	<insert id="insertRoleUser" parameterType="com.stock.sp.apiserver.system.user.dto.req.UserCreateReqDto">
@@ -299,7 +299,7 @@
         */
         INSERT INTO TB_ROLE_USER_MAPG
         (
-        USER_ID,
+        userId,
         ROLE_ID,
         REG_DT,
         REG_USER_ID,
@@ -322,7 +322,7 @@
         SQL 명: 사용자 역할 삭제(user id, cuco id 조건)
         */
         DELETE FROM TB_ROLE_USER_MAPG
-        WHERE USER_ID = #{userId}
+        WHERE userId = #{userId}
 	</delete>
 
 	<update id="updateRoleUser" parameterType="com.stock.sp.apiserver.system.user.dto.RoleUserMapgDto">
@@ -332,18 +332,18 @@
         */
         UPDATE TB_ROLE_USER_MAPG
         SET ROLE_ID = #{roleId}
-        WHERE USER_ID = #{userId}
+        WHERE userId = #{userId}
 	</update>
 
 	<sql id="roleUserSelect">
 		SELECT
 		ROW_NUMBER() OVER(ORDER BY TU.REG_DT) AS ROW_NUM
-		, TU.USER_ID
+		, TU.userId
 		, TU.USER_NM
 		, TR.ROLE_NM
-		FROM TB_USER TU
+		FROM T_USER TU
 		LEFT JOIN TB_ROLE_USER_MAPG TRUM
-		ON TRUM.USER_ID = TU.USER_ID
+		ON TRUM.userId = TU.userId
 		LEFT JOIN TB_ROLE TR
 		ON TR.ROLE_ID = TRUM.ROLE_ID
 	</sql>
@@ -351,7 +351,7 @@
 	<sql id="roleUserSearch">
 		<where>
 			<if test="searchType == 'userId'">
-				AND U.USER_ID LIKE CONCAT('%', REGEXP_REPLACE(#{keyword}, '(\_|\%)', '\\\\\\1'), '%')
+				AND U.userId LIKE CONCAT('%', REGEXP_REPLACE(#{keyword}, '(\_|\%)', '\\\\\\1'), '%')
 			</if>
 			<if test="searchType == 'userNm'">
 				AND U.USER_NM LIKE CONCAT('%', REGEXP_REPLACE(#{keyword}, '(\_|\%)', '\\\\\\1'), '%')
@@ -375,7 +375,7 @@
 		SQL ID : com.stock.sp.apiserver.system.user.selectRoleUserTotalCount
 		SQL 명: 사용자 역할 조회(Count)
 		*/
-		SELECT COUNT(TB.USER_ID)
+		SELECT COUNT(TB.userId)
 		FROM
 		(
 		<include refid="roleUserSelect"/>
@@ -389,8 +389,8 @@
 		* SQL 명: 고객사 사용자 마스터 여부 조회
 		*/
 		SELECT SYS_MNGR_YN
-		FROM TB_USER
-		WHERE USER_ID = #{userId, jdbcType=VARCHAR}
+		FROM T_USER
+		WHERE userId = #{userId, jdbcType=VARCHAR}
 	</select>
 
 </mapper>

@@ -11,9 +11,9 @@
 			a.role_id		as role_id/* 역할 아이디 */
 		FROM TB_ROLE_USER_MAPG a
 				 INNER JOIN TB_ROLE role on a.role_id = role.role_id
-				 INNER JOIN TB_USER usr on a.USER_ID = usr.USER_ID and usr.STUS_CD = 'ACTIVE'
+				 INNER JOIN T_USER usr on a.userId = usr.userId and usr.STUS_CD = 'ACTIVE'
 		WHERE
-			a.USER_ID = #{usrId}
+			a.userId = #{usrId}
 	</select>
 
 	<select id="getRoleMenuScrnRoleUse" parameterType="java.util.List" resultType="com.stock.sp.apiserver.system.role.dto.RoleMenuScrnMapg">
@@ -593,7 +593,7 @@
 		INSERT
 		  INTO TB_ROLE_USER_MAPG (
 		  	 ROLE_ID
-			 , USER_ID
+			 , userId
 			 , REG_DT
 			 , REG_USER_ID
 			 , UPD_DT
@@ -619,7 +619,7 @@
 		*/
 		DELETE FROM TB_ROLE_USER_MAPG
 		WHERE
-			USER_ID = #{userId}
+			userId = #{userId}
 	</delete>
 
 	<delete id="deleteAllUsrAssigned" parameterType="java.lang.String">
@@ -641,7 +641,7 @@
 		  FROM TB_ROLE_USER_MAPG
 		 WHERE
 		<foreach collection="list" item="item" index="index" separator=" OR " open="(" close=")">
-		   USER_ID = #{item.userId}
+		   userId = #{item.userId}
 		   AND ROLE_ID = #{item.roleId}
 		</foreach>
 	</delete>
@@ -730,7 +730,7 @@
 		SQL 명: 역할기준 역할-사용자 매핑 정보 조회
 		*/
 		SELECT ROLE_ID
-			 , USER_ID
+			 , userId
 		  FROM TB_ROLE_USER_MAPG
 		 WHERE ROLE_ID = #{roleId}
 	</select>

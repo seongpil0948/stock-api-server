@@ -9,9 +9,9 @@
         */
         SELECT
         TU.PSWD /* 암호화된 패스워드 */
-        FROM TB_USER TU
+        FROM T_USER TU
         WHERE
-        TU.USER_ID = #{usrId}
+        TU.userId = #{usrId}
         AND TU.STAT_CD = 'ACTIVE'
     </select>
 
@@ -20,7 +20,7 @@
         SQL ID : com.stock.sp.apiserver.system.login.dao.LginDao.selectUser
         SQL 명: 로그인할 사용자 조회
         */
-        SELECT TU.USER_ID AS USER_ID
+        SELECT TU.userId AS userId
              , TU.USER_NM AS USER_NAME
              , TU.BAS_BRCH AS BASE_HQ_CODE
              , BRCH_CD.CD_NM as BASE_HQ
@@ -33,21 +33,21 @@
              , TU.LTNO_LDONG_NM AS BASE_DONG
              , TU.AFLTD_CMPNY AS COMPANY
              , TU.EMPNUM AS EMPLOYEE_NUM
-        FROM TB_USER TU
-        LEFT JOIN TB_CD TC
+        FROM T_USER TU
+        LEFT JOIN T_COMMON_CODE TC
         ON TU.STAT_CD = TC.CD AND TC.CD_GRP = 'STATE_CD'
-        LEFT OUTER JOIN TB_CD BRCH_CD
+        LEFT OUTER JOIN T_COMMON_CODE BRCH_CD
                         ON TU.BAS_BRCH = BRCH_CD.CD
                             AND BRCH_CD.CD_GRP = 'BRCH_CD'
-        LEFT OUTER JOIN TB_CD CITY_CD
+        LEFT OUTER JOIN T_COMMON_CODE CITY_CD
                         ON TU.LTNO_CITY_NM = CITY_CD.CD
                             AND CITY_CD.CD_GRP = BRCH_CD.CD
-        LEFT OUTER JOIN TB_CD COUNTY_CD
+        LEFT OUTER JOIN T_COMMON_CODE COUNTY_CD
                         ON TU.LTNO_SGG_NM = COUNTY_CD.CD
-        LEFT OUTER JOIN TB_CD DISTRICT_CD
+        LEFT OUTER JOIN T_COMMON_CODE DISTRICT_CD
                         ON TU.LTNO_EMD_NM = DISTRICT_CD.CD
         WHERE
-        TU.USER_ID = #{usrId}
+        TU.userId = #{usrId}
         AND TU.STAT_CD = 'ACTIVE'
     </select>
 
@@ -62,10 +62,10 @@
         FROM TB_ROLE_USER_MAPG A
         INNER JOIN TB_ROLE TR
             ON A.ROLE_ID = TR.ROLE_ID
-        INNER JOIN TB_USER TU
-            ON A.USER_ID = TU.USER_ID
+        INNER JOIN T_USER TU
+            ON A.userId = TU.userId
             AND TU.STAT_CD = 'ACTIVE'
-        WHERE A.USER_ID = #{userId}
+        WHERE A.userId = #{userId}
     </select>
 
     <select id="selectLoginUserMenuList" parameterType="com.stock.sp.apiserver.common.login.dto.req.LoginReqDto" resultType="com.stock.sp.apiserver.common.login.dto.res.LoginUserMenuDto">
